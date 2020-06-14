@@ -13,6 +13,17 @@
 #include <thread>
 
 #include <vsomeip/vsomeip.hpp>
+#include <vsomeip/enumeration_types.hpp>
+#ifdef VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS
+#include "implementation/configuration/include/configuration_impl.hpp"
+#else
+#include "implementation/configuration/include/configuration.hpp"
+#include "implementation/configuration/include/configuration_plugin.hpp"
+#endif // VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS
+
+#include <implementation/configuration/include/service.hpp>
+#include <implementation/configuration/include/eventgroup.hpp>
+#include <implementation/configuration/include/event.hpp>
 
 #include "sample-ids.hpp"
 
@@ -28,6 +39,7 @@ public:
             std::cerr << "Couldn't initialize application" << std::endl;
             return false;
         }
+		configuration_ = app_->get_configuration();
         std::cout << "Client settings [protocol="
                 << (use_tcp_ ? "TCP" : "UDP")
                 << "]"
@@ -36,27 +48,44 @@ public:
         app_->register_state_handler(
                 std::bind(&client_sample::on_state, this,
                         std::placeholders::_1));
-
-        app_->register_message_handler(
-                vsomeip::ANY_SERVICE, SAMPLE_INSTANCE_ID, vsomeip::ANY_METHOD,
+		for (auto i : configuration_->get_remote_services()) {
+			app_->register_message_handler(
+                vsomeip::ANY_SERVICE, //i.first,
+                i.second, 
+                vsomeip::ANY_METHOD, //SAMPLE_GET_METHOD_ID,
                 std::bind(&client_sample::on_message, this,
-                        std::placeholders::_1));
+                          std::placeholders::_1));
+			
 
-        app_->register_availability_handler(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID,
-                std::bind(&client_sample::on_availability,
-                          this,
-                          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+			/* app_->register_message_handler( */
+			/*         vsomeip::ANY_SERVICE, SAMPLE_INSTANCE_ID, vsomeip::ANY_METHOD, */
+			/*         std::bind(&client_sample::on_message, this, */
+			/*                 std::placeholders::_1)); */
 
-        std::set<vsomeip::eventgroup_t> its_groups;
-        its_groups.insert(SAMPLE_EVENTGROUP_ID);
-        app_->request_event(
-                SAMPLE_SERVICE_ID,
-                SAMPLE_INSTANCE_ID,
-                SAMPLE_EVENT_ID,
-                its_groups,
-                vsomeip::event_type_e::ET_FIELD);
-        app_->subscribe(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_EVENTGROUP_ID);
+			app_->register_availability_handler(i.first, i.second,
+												std::bind(&client_sample::on_availability,
+														  this,
+														  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
+			auto service = configuration_->find_service(i.first, i.second);
+			
+			for (auto j : service->eventgroups_)
+			{
+				std::set<vsomeip::eventgroup_t> its_groups;
+				its_groups.insert(j.first);
+				for (auto k : j.second->events_)
+				{
+					app_->request_event(
+						i.first,
+						i.second, 
+						k->id_,
+						its_groups,
+						vsomeip::event_type_e::ET_FIELD);
+					
+					app_->subscribe(i.first, i.second, j.first);
+				}
+			}
+		}
         return true;
     }
 
@@ -146,6 +175,7 @@ public:
 
 private:
     std::shared_ptr< vsomeip::application > app_;
+    std::shared_ptr<vsomeip_v3::configuration> configuration_;
     bool use_tcp_;
 };
 

@@ -227,6 +227,9 @@ public:
             std::uint16_t _port_service, method_t _method) const;
 
     VSOMEIP_EXPORT std::uint32_t get_shutdown_timeout() const;
+	
+	VSOMEIP_EXPORT const std::shared_ptr<service> find_service(service_t _service, instance_t _instance) const;
+
 private:
     void read_data(const std::set<std::string> &_input,
             std::vector<configuration_element> &_elements,
@@ -335,7 +338,7 @@ private:
     servicegroup *find_servicegroup(const std::string &_name) const;
     std::shared_ptr<client> find_client(service_t _service,
             instance_t _instance) const;
-    std::shared_ptr<service> find_service(service_t _service, instance_t _instance) const;
+//ilya    std::shared_ptr<service> find_service(service_t _service, instance_t _instance) const;
     std::shared_ptr<service> find_service_unlocked(service_t _service, instance_t _instance) const;
     service * find_service_by_ip_port(service_t _service, const std::string& _ip,
                                       std::uint16_t _port) const;

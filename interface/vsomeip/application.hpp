@@ -17,7 +17,7 @@
 #include <vsomeip/function_types.hpp>
 #include <vsomeip/constants.hpp>
 #include <vsomeip/handler.hpp>
-
+#include "../../implementation/configuration/include/configuration.hpp" // ilya
 namespace vsomeip_v3 {
 
 class configuration_public;
@@ -145,6 +145,7 @@ public:
      */
     virtual security_mode_e get_security_mode() const = 0;
 
+	virtual std::shared_ptr<configuration> get_configuration() const = 0;
     /**
      *
      * \brief Offers a SOME/IP service instance.

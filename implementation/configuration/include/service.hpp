@@ -15,7 +15,7 @@ namespace cfg {
 
 struct event;
 struct eventgroup;
-
+	struct servicegroup;
 struct service {
     service_t service_;
     instance_t instance_;

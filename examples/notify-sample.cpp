@@ -14,7 +14,17 @@
 #include <mutex>
 
 #include <vsomeip/vsomeip.hpp>
+#include "implementation/configuration/include/configuration.hpp"
+/* #ifdef VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS */
+/* #include "implementation/configuration/include/configuration_impl.hpp" */
+/* #else */
+/* #include "implementation/configuration/include/configuration.hpp" */
+/* #include "implementation/configuration/include/configuration_plugin.hpp" */
+/* #endif // VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS */
 
+#include <implementation/configuration/include/eventgroup.hpp>
+#include <implementation/configuration/include/event.hpp>
+#include <implementation/configuration/include/service.hpp>
 #include "sample-ids.hpp"
 
 class service_sample {
@@ -38,33 +48,75 @@ public:
             std::cerr << "Couldn't initialize application" << std::endl;
             return false;
         }
-        app_->register_state_handler(
-                std::bind(&service_sample::on_state, this,
-                        std::placeholders::_1));
-
-        app_->register_message_handler(
-                SAMPLE_SERVICE_ID,
-                SAMPLE_INSTANCE_ID,
+		configuration_ = app_->get_configuration();
+		for (auto i : configuration_->get_remote_services()) {
+			app_->register_message_handler(
+                i.first,
+                i.second, 
                 SAMPLE_GET_METHOD_ID,
                 std::bind(&service_sample::on_get, this,
                           std::placeholders::_1));
+			
+			/* app_->register_message_handler( */
+			/*         SAMPLE_SERVICE_ID, */
+			/*         SAMPLE_INSTANCE_ID, */
+			/*         SAMPLE_SET_METHOD_ID, */
+			/*         std::bind(&service_sample::on_set, this, */
+			/*                   std::placeholders::_1)); */
+			auto service = configuration_->find_service(i.first, i.second);
+			
+			for (auto j : service->eventgroups_)
+			{
+				std::set<vsomeip::eventgroup_t> its_groups;
+				its_groups.insert(j.first);
+				for (auto k : j.second->events_)
+				{
+					app_->offer_event(
+						i.first,
+						i.second, 
+						k->id_,
+						its_groups,
+						vsomeip::event_type_e::ET_FIELD,
+						std::chrono::milliseconds::zero(), // cycle
+						false, // change resets cycle
+						true, // update on change
+						nullptr, // epsilon change func
+						vsomeip::reliability_type_e::RT_UNKNOWN);
+					/* { */
+					/* 	std::lock_guard<std::mutex> its_lock(payload_mutex_); */
+					/* 	payload_ = vsomeip::runtime::get()->create_payload(); */
+					/* } */
+				}
+			}
+		}
 
-        app_->register_message_handler(
-                SAMPLE_SERVICE_ID,
-                SAMPLE_INSTANCE_ID,
-                SAMPLE_SET_METHOD_ID,
-                std::bind(&service_sample::on_set, this,
-                          std::placeholders::_1));
+        /* app_->register_state_handler( */
+        /*         std::bind(&service_sample::on_state, this, */
+        /*                 std::placeholders::_1)); */
 
-        std::set<vsomeip::eventgroup_t> its_groups;
-        its_groups.insert(SAMPLE_EVENTGROUP_ID);
-        app_->offer_event(
-                SAMPLE_SERVICE_ID,
-                SAMPLE_INSTANCE_ID,
-                SAMPLE_EVENT_ID,
-                its_groups,
-                vsomeip::event_type_e::ET_FIELD, std::chrono::milliseconds::zero(),
-                false, true, nullptr, vsomeip::reliability_type_e::RT_UNKNOWN);
+        /* app_->register_message_handler( */
+        /*         SAMPLE_SERVICE_ID, */
+        /*         SAMPLE_INSTANCE_ID, */
+        /*         SAMPLE_GET_METHOD_ID, */
+        /*         std::bind(&service_sample::on_get, this, */
+        /*                   std::placeholders::_1)); */
+
+        /* app_->register_message_handler( */
+        /*         SAMPLE_SERVICE_ID, */
+        /*         SAMPLE_INSTANCE_ID, */
+        /*         SAMPLE_SET_METHOD_ID, */
+        /*         std::bind(&service_sample::on_set, this, */
+        /*                   std::placeholders::_1)); */
+
+        /* std::set<vsomeip::eventgroup_t> its_groups; */
+        /* its_groups.insert(SAMPLE_EVENTGROUP_ID); */
+        /* app_->offer_event( */
+        /*         SAMPLE_SERVICE_ID, */
+        /*         SAMPLE_INSTANCE_ID, */
+        /*         SAMPLE_EVENT_ID, */
+        /*         its_groups, */
+        /*         vsomeip::event_type_e::ET_FIELD, std::chrono::milliseconds::zero(), */
+        /*         false, true, nullptr, vsomeip::reliability_type_e::RT_UNKNOWN); */
         {
             std::lock_guard<std::mutex> its_lock(payload_mutex_);
             payload_ = vsomeip::runtime::get()->create_payload();
@@ -204,6 +256,7 @@ public:
 
 private:
     std::shared_ptr<vsomeip::application> app_;
+    std::shared_ptr<vsomeip_v3::configuration> configuration_;
     bool is_registered_;
     bool use_tcp_;
     uint32_t cycle_;

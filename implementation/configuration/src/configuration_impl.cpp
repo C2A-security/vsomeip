@@ -2602,7 +2602,7 @@ configuration_impl::get_service_reliability(service_t _service,
     return its_reliability;
 }
 
-std::shared_ptr<service> configuration_impl::find_service(service_t _service,
+const std::shared_ptr<service> configuration_impl::find_service(service_t _service,
         instance_t _instance) const {
     std::lock_guard<std::mutex> its_lock(services_mutex_);
     return find_service_unlocked(_service, _instance);

@@ -34,13 +34,14 @@
 #endif // ANDROID
 
 #include "../../security/include/policy.hpp"
-
 #define VSOMEIP_CONFIG_PLUGIN_VERSION              1
 
 namespace vsomeip_v3 {
 
 class event;
-
+	namespace cfg {
+		class service;
+	}
 class configuration {
 public:
     virtual ~configuration()
@@ -67,6 +68,7 @@ public:
 
     virtual const boost::asio::ip::address & get_unicast_address() const = 0;
     virtual const boost::asio::ip::address& get_netmask() const = 0;
+	virtual const std::shared_ptr<cfg::service> find_service(service_t _service, instance_t _instance) const = 0;
     virtual const std::string &get_device() const = 0;
     virtual diagnosis_t get_diagnosis_address() const = 0;
     virtual diagnosis_t get_diagnosis_mask() const = 0;
