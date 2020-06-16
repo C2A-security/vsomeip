@@ -61,7 +61,7 @@ public:
         }
 		configuration_ = app_->get_configuration();
 		std::cout << "Got configuration "<<std::endl;
-		for (auto i : configuration_->get_remote_services()) {
+		for (auto i : configuration_->get_local_services()) {
 
 			app_->register_message_handler(
                 i.first,

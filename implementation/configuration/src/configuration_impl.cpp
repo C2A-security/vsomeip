@@ -2453,7 +2453,7 @@ configuration_impl::get_local_services() const {
 	std::cout << "Configuration : total "<<services_.size() << std::endl;
     for (const auto& i : services_) {
         for (const auto& j : i.second) {
-            if (is_local_service(i.first, j.first)) {
+            if (!is_remote(j.second) && !is_internal_service(i.first, j.first)) {
                 its_local_services.insert(std::make_pair(i.first, j.first));
             }
         }
