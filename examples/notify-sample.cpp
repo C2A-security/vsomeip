@@ -66,25 +66,33 @@ public:
 			app_->register_message_handler(
                 i.first,
                 i.second, 
+                SAMPLE_SET_METHOD_ID,
+                std::bind(&service_sample::on_set, this,
+                          std::placeholders::_1));
+			
+			app_->register_message_handler(
+                i.first,
+                i.second, 
                 SAMPLE_GET_METHOD_ID,
                 std::bind(&service_sample::on_get, this,
                           std::placeholders::_1));
-			
-			/* app_->register_message_handler( */
-			/*         SAMPLE_SERVICE_ID, */
-			/*         SAMPLE_INSTANCE_ID, */
-			/*         SAMPLE_SET_METHOD_ID, */
-			/*         std::bind(&service_sample::on_set, this, */
-			/*                   std::placeholders::_1)); */
+
 			auto service = configuration_->find_service(i.first, i.second);
 			service_map.insert(std::make_pair(i, service));
 			std::cout << "Got service "<<std::hex<<i.first<<":"<<i.second<<std::endl;
 			for (auto j : service->eventgroups_)
 			{
+				if (!j.first)
+					continue;
 				std::set<vsomeip::eventgroup_t> its_groups;
 				its_groups.insert(j.first);
 				for (auto k : j.second->events_)
 				{
+					std::cout << "Will offer event "<<std::hex<<
+						i.first<<":"<<
+						i.second<<":"<< 
+						k->id_<<":"<<std::endl;
+					
 					app_->offer_event(
 						i.first,
 						i.second, 
@@ -95,7 +103,7 @@ public:
 						false, // change resets cycle
 						true, // update on change
 						nullptr, // epsilon change func
-						vsomeip::reliability_type_e::RT_UNKNOWN);
+						k->reliability_);
 					/* { */
 					/* 	std::lock_guard<std::mutex> its_lock(payload_mutex_); */
 					/* 	payload_ = vsomeip::runtime::get()->create_payload(); */
@@ -103,34 +111,6 @@ public:
 				}
 			}
 		}
-
-        /* app_->register_state_handler( */
-        /*         std::bind(&service_sample::on_state, this, */
-        /*                 std::placeholders::_1)); */
-
-        /* app_->register_message_handler( */
-        /*         SAMPLE_SERVICE_ID, */
-        /*         SAMPLE_INSTANCE_ID, */
-        /*         SAMPLE_GET_METHOD_ID, */
-        /*         std::bind(&service_sample::on_get, this, */
-        /*                   std::placeholders::_1)); */
-
-        /* app_->register_message_handler( */
-        /*         SAMPLE_SERVICE_ID, */
-        /*         SAMPLE_INSTANCE_ID, */
-        /*         SAMPLE_SET_METHOD_ID, */
-        /*         std::bind(&service_sample::on_set, this, */
-        /*                   std::placeholders::_1)); */
-
-        /* std::set<vsomeip::eventgroup_t> its_groups; */
-        /* its_groups.insert(SAMPLE_EVENTGROUP_ID); */
-        /* app_->offer_event( */
-        /*         SAMPLE_SERVICE_ID, */
-        /*         SAMPLE_INSTANCE_ID, */
-        /*         SAMPLE_EVENT_ID, */
-        /*         its_groups, */
-        /*         vsomeip::event_type_e::ET_FIELD, std::chrono::milliseconds::zero(), */
-        /*         false, true, nullptr, vsomeip::reliability_type_e::RT_UNKNOWN); */
         {
             std::lock_guard<std::mutex> its_lock(payload_mutex_);
             payload_ = vsomeip::runtime::get()->create_payload();
@@ -210,8 +190,17 @@ public:
         }
 
         app_->send(its_response);
+		uint16_t event_ = SAMPLE_EVENT_ID;
+
+		auto service_ = service_map.at(std::make_pair(_message->get_service(), _message->get_instance()));
+		if (service_)
+		{
+			event_ = service_->events_[0]->id_ ; // ilya come here
+		}
+		std::cout << "On set will notify event id "<< std::hex << event_ << std::endl;
+
         app_->notify(_message->get_service(), _message->get_instance(),
-                     SAMPLE_EVENT_ID, payload_);
+                     event_, payload_);
     }
 
     void run() {
@@ -227,7 +216,7 @@ public:
                 stop_offer();
 
             for (int i = 0; i < 10 && running_; i++)
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
             is_offer = !is_offer;
         }
@@ -237,38 +226,60 @@ public:
 		
         std::shared_ptr<vsomeip::message> its_message
             = vsomeip::runtime::get()->create_request(use_tcp_);
+		while (running_) {
+			for (auto i : service_map)
+			{			
+				its_message->set_service(i.first.first);
+				its_message->set_instance(i.first.second);
+				its_message->set_method(SAMPLE_GET_METHOD_ID); // or SET ??
+				uint16_t event_ = SAMPLE_EVENT_ID;
+				auto service_ = service_map.at(i.first);
+				
+				if (service_)
+				{
+					for (auto j : service_->eventgroups_)
+					{
+						if (!j.first)
+							continue;
+						for (auto k : j.second->events_)
+						{
+							event_ = k->id_ ;
+							break;
+						}
+						if (SAMPLE_EVENT_ID!=event_)
+							break; // ilya come here setting only first
+					}
+				}
+				vsomeip::byte_t its_data[10];
+				uint32_t its_size = 1;
+			
+				std::unique_lock<std::mutex> its_lock(notify_mutex_);
+				while (!is_offered_ && running_)
+					notify_condition_.wait(its_lock);
+				while (is_offered_ && running_) {
+					if (its_size == sizeof(its_data))
+						its_size = 1;
+					
+					for (uint32_t i = 0; i < its_size; ++i)
+						its_data[i] = static_cast<uint8_t>(i);
+					
+					{
+						std::lock_guard<std::mutex> its_lock(payload_mutex_);
+						payload_->set_data(its_data, its_size);
+						
+						std::cout << "Setting event "<<std::hex <<
+							i.first.first<<":"<< i.first.second<<":"<<
+							event_ <<
+							"(Length=" << std::dec << its_size << ")." << std::endl;
+						app_->notify(i.first.first, i.first.second, event_, payload_);
+					}
 
-        its_message->set_service(SAMPLE_SERVICE_ID);
-        its_message->set_instance(SAMPLE_INSTANCE_ID);
-        its_message->set_method(SAMPLE_SET_METHOD_ID);
+					its_size++;
 
-        vsomeip::byte_t its_data[10];
-        uint32_t its_size = 1;
-
-        while (running_) {
-            std::unique_lock<std::mutex> its_lock(notify_mutex_);
-            while (!is_offered_ && running_)
-                notify_condition_.wait(its_lock);
-            while (is_offered_ && running_) {
-                if (its_size == sizeof(its_data))
-                    its_size = 1;
-
-                for (uint32_t i = 0; i < its_size; ++i)
-                    its_data[i] = static_cast<uint8_t>(i);
-
-                {
-                    std::lock_guard<std::mutex> its_lock(payload_mutex_);
-                    payload_->set_data(its_data, its_size);
-
-                    std::cout << "Setting event (Length=" << std::dec << its_size << ")." << std::endl;
-                    app_->notify(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_EVENT_ID, payload_);
-                }
-
-                its_size++;
-
-                std::this_thread::sleep_for(std::chrono::milliseconds(cycle_));
-            }
-        }
+					std::this_thread::sleep_for(std::chrono::milliseconds(cycle_));
+				}
+			}
+		}
     }
 
 private:

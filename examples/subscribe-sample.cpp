@@ -48,7 +48,8 @@ public:
         app_->register_state_handler(
                 std::bind(&client_sample::on_state, this,
                         std::placeholders::_1));
-		for (auto i : configuration_->get_remote_services()) {
+		for (auto i : configuration_->get_local_services()) {
+			std::cout << "Registering message handler for instance"<<std::hex <<i.second<<std::endl;
 			app_->register_message_handler(
                 vsomeip::ANY_SERVICE, //i.first,
                 i.second, 
@@ -56,12 +57,6 @@ public:
                 std::bind(&client_sample::on_message, this,
                           std::placeholders::_1));
 			
-
-			/* app_->register_message_handler( */
-			/*         vsomeip::ANY_SERVICE, SAMPLE_INSTANCE_ID, vsomeip::ANY_METHOD, */
-			/*         std::bind(&client_sample::on_message, this, */
-			/*                 std::placeholders::_1)); */
-
 			app_->register_availability_handler(i.first, i.second,
 												std::bind(&client_sample::on_availability,
 														  this,
@@ -75,6 +70,11 @@ public:
 				its_groups.insert(j.first);
 				for (auto k : j.second->events_)
 				{
+					std::cout << "Will request event "<< std::hex <<
+						i.first<<":"<<
+						i.second<<":"<< 
+						k->id_<<":"<<std::endl;
+
 					app_->request_event(
 						i.first,
 						i.second, 
