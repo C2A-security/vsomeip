@@ -177,6 +177,8 @@ public:
             std::lock_guard<std::mutex> its_lock(payload_mutex_);
             its_response->set_payload(payload_);
         }
+		std::cout << "On get will respond for "<< std::hex << 
+			_message->get_service() <<":"<< _message->get_instance() << std::endl;
         app_->send(its_response);
     }
 
@@ -195,7 +197,7 @@ public:
 		auto service_ = service_map.at(std::make_pair(_message->get_service(), _message->get_instance()));
 		if (service_)
 		{
-			event_ = service_->events_[0]->id_ ; // ilya come here
+			event_ = service_->eventgroups_.begin()->second->events_.begin()->get()->id_ ; // ilya come here
 		}
 		std::cout << "On set will notify event id "<< std::hex << event_ << std::endl;
 
@@ -211,12 +213,17 @@ public:
         bool is_offer(true);
         while (running_) {
             if (is_offer)
-                offer();
+            {
+				offer();
+				for (int i = 0; i < 10 && running_; i++)
+					std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+			}
             else
+			{
                 stop_offer();
-
-            for (int i = 0; i < 10 && running_; i++)
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+				for (int i = 0; i < 10 && running_; i++)
+					std::this_thread::sleep_for(std::chrono::milliseconds(500));
+			}
 
             is_offer = !is_offer;
         }
@@ -319,7 +326,7 @@ private:
 
 int main(int argc, char **argv) {
     bool use_tcp = false;
-    uint32_t cycle = 1000; // default 1s
+    uint32_t cycle = 2000; // default 1/2 s
 
     std::string tcp_enable("--tcp");
     std::string udp_enable("--udp");
