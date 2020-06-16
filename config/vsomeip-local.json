@@ -1,5 +1,5 @@
 {
-    "unicast" : "10.0.2.15",
+    "unicast" : "169.254.156.200",
     "logging" :
     { 
         "level" : "debug",
@@ -37,7 +37,7 @@
                     "update-cycle" : 2000
                 },
                 {
-                    "event" : "0x0778",
+                    "event" : "0x8779",
                     "is_field" : "true",
                     "update-cycle" : 0
                 },
@@ -64,7 +64,7 @@
             ]
         }
     ],
-    "routing" : "service-sample",
+    "routing" : "client-sample",
     "service-discovery" :
     {
         "enable" : "true",

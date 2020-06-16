@@ -117,6 +117,7 @@ public:
             std::map<bool, std::set<uint16_t> > &_used_client_ports, uint16_t &_client_port) const = 0;
 
     virtual std::set<std::pair<service_t, instance_t> > get_remote_services() const = 0;
+    virtual std::set<std::pair<service_t, instance_t> > get_local_services() const = 0;
 
     virtual bool get_multicast(service_t _service, instance_t _instance,
             eventgroup_t _eventgroup, std::string &_address, uint16_t &_port) const = 0;

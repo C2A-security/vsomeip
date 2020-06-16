@@ -10,6 +10,7 @@
 #include <sstream>
 #include <limits>
 #include <utility>
+#include <iostream> // ilya rmme
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -2445,6 +2446,21 @@ configuration_impl::get_remote_services() const {
     return its_remote_services;
 }
 
+std::set<std::pair<service_t, instance_t> >
+configuration_impl::get_local_services() const {
+    std::lock_guard<std::mutex> its_lock(services_mutex_);
+    std::set<std::pair<service_t, instance_t> > its_local_services;
+	std::cout << "Configuration : total "<<services_.size() << std::endl;
+    for (const auto& i : services_) {
+        for (const auto& j : i.second) {
+            if (is_local_service(i.first, j.first)) {
+                its_local_services.insert(std::make_pair(i.first, j.first));
+            }
+        }
+    }
+    return its_local_services;
+}
+	
 bool configuration_impl::is_mandatory(const std::string &_name) const {
     std::set<std::string> its_candidates;
     for (const auto& m : mandatory_) {

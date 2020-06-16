@@ -21,11 +21,22 @@
 /* #include "implementation/configuration/include/configuration.hpp" */
 /* #include "implementation/configuration/include/configuration_plugin.hpp" */
 /* #endif // VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS */
-
+//#include <implementation/configuration/include/service.hpp>
 #include <implementation/configuration/include/eventgroup.hpp>
 #include <implementation/configuration/include/event.hpp>
 #include <implementation/configuration/include/service.hpp>
 #include "sample-ids.hpp"
+
+struct service_info {
+    vsomeip::service_t service_id;
+    vsomeip::instance_t instance_id;
+    vsomeip::method_t method_id;
+    vsomeip::event_t event_id;
+    vsomeip::eventgroup_t eventgroup_id;
+    vsomeip::method_t shutdown_method_id;
+    vsomeip::method_t notify_method_id;
+};
+
 
 class service_sample {
 public:
@@ -49,7 +60,9 @@ public:
             return false;
         }
 		configuration_ = app_->get_configuration();
+		std::cout << "Got configuration "<<std::endl;
 		for (auto i : configuration_->get_remote_services()) {
+
 			app_->register_message_handler(
                 i.first,
                 i.second, 
@@ -64,7 +77,8 @@ public:
 			/*         std::bind(&service_sample::on_set, this, */
 			/*                   std::placeholders::_1)); */
 			auto service = configuration_->find_service(i.first, i.second);
-			
+			service_map.insert(std::make_pair(i, service));
+			std::cout << "Got service "<<std::hex<<i.first<<":"<<i.second<<std::endl;
 			for (auto j : service->eventgroups_)
 			{
 				std::set<vsomeip::eventgroup_t> its_groups;
@@ -150,13 +164,15 @@ public:
 
     void offer() {
         std::lock_guard<std::mutex> its_lock(notify_mutex_);
-        app_->offer_service(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID);
+		for (auto i : service_map)
+			app_->offer_service(i.first.first, i.first.second);
         is_offered_ = true;
         notify_condition_.notify_one();
     }
 
     void stop_offer() {
-        app_->stop_offer_service(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID);
+		for (auto i : service_map)		
+				 app_->stop_offer_service(i.first.first, i.first.second);
         is_offered_ = false;
     }
 
@@ -194,7 +210,7 @@ public:
         }
 
         app_->send(its_response);
-        app_->notify(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID,
+        app_->notify(_message->get_service(), _message->get_instance(),
                      SAMPLE_EVENT_ID, payload_);
     }
 
@@ -218,6 +234,7 @@ public:
     }
 
     void notify() {
+		
         std::shared_ptr<vsomeip::message> its_message
             = vsomeip::runtime::get()->create_request(use_tcp_);
 
@@ -273,6 +290,8 @@ private:
     std::mutex payload_mutex_;
     std::shared_ptr<vsomeip::payload> payload_;
 
+	//serviceinfo service_info;  
+	std::map<std::pair<vsomeip_v3::service_t, vsomeip_v3::instance_t>, std::shared_ptr<vsomeip_v3::cfg::service>> service_map;
     // blocked_ / is_offered_ must be initialized before starting the threads!
     std::thread offer_thread_;
     std::thread notify_thread_;

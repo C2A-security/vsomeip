@@ -117,6 +117,7 @@ public:
     VSOMEIP_EXPORT std::size_t get_request_debouncing(const std::string &_name) const;
 
     VSOMEIP_EXPORT std::set<std::pair<service_t, instance_t> > get_remote_services() const;
+    VSOMEIP_EXPORT std::set<std::pair<service_t, instance_t> > get_local_services() const;
 
     VSOMEIP_EXPORT bool get_multicast(service_t _service, instance_t _instance,
             eventgroup_t _eventgroup, std::string &_address, uint16_t &_port) const;
