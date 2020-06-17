@@ -10,7 +10,8 @@ set (VSOMEIP_COMPAT_NAME vsomeip)
 
 set(EXAMPLE_CONFIG_FILES
     "../config/vsomeip.json"
-    "../config/vsomeip-local.json"
+    "../config/vsomeip-local.service.json"
+    "../config/vsomeip-local.client.json"	
     "../config/vsomeip-tcp-client.json"
     "../config/vsomeip-tcp-service.json"
     "../config/vsomeip-udp-client.json"
