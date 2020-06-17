@@ -151,9 +151,11 @@ public:
     }
 
     void stop_offer() {
+        std::lock_guard<std::mutex> its_lock(notify_mutex_);
 		for (auto i : service_map)		
-				 app_->stop_offer_service(i.first.first, i.first.second);
+			app_->stop_offer_service(i.first.first, i.first.second);
         is_offered_ = false;
+        notify_condition_.notify_one();
     }
 
     void on_state(vsomeip::state_type_e _state) {
@@ -192,7 +194,7 @@ public:
         }
 
         app_->send(its_response);
-		uint16_t event_ = SAMPLE_EVENT_ID;
+		uint16_t event_ = 0;//SAMPLE_EVENT_ID;
 
 		auto service_ = service_map.at(std::make_pair(_message->get_service(), _message->get_instance()));
 		if (service_)
@@ -216,13 +218,13 @@ public:
             {
 				offer();
 				for (int i = 0; i < 10 && running_; i++)
-					std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+					std::this_thread::sleep_for(std::chrono::milliseconds(200));
 			}
             else
 			{
-                stop_offer();
+// ilya wth                stop_offer();
 				for (int i = 0; i < 10 && running_; i++)
-					std::this_thread::sleep_for(std::chrono::milliseconds(50));
+					std::this_thread::sleep_for(std::chrono::milliseconds(200));
 			}
 
             is_offer = !is_offer;
@@ -235,8 +237,8 @@ public:
             = vsomeip::runtime::get()->create_request(use_tcp_);
 		vsomeip::byte_t its_data[10];
 		uint32_t its_size = 1;
-		for (uint32_t i = 0; i < its_size; ++i)
-			its_data[i] = static_cast<uint8_t>(i);
+		for (uint32_t i = 0; i < 10; ++i)
+			its_data[i] = static_cast<uint8_t>(i+1);
 		while (running_) {
 
 			for (auto i : service_map)
