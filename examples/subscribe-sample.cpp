@@ -49,7 +49,7 @@ public:
                 std::bind(&client_sample::on_state, this,
                         std::placeholders::_1));
 		for (auto i : configuration_->get_local_services()) {
-			std::cout << "Registering message handler for instance"<<std::hex <<i.second<<std::endl;
+			std::cout << "Registering message handler for instance "<<std::hex <<i.second<<std::endl;
 			app_->register_message_handler(
                 vsomeip::ANY_SERVICE, //i.first,
                 i.second, 
@@ -70,7 +70,7 @@ public:
 				its_groups.insert(j.first);
 				for (auto k : j.second->events_)
 				{
-					std::cout << "Will request event "<< std::hex <<
+					std::cout << "Will request event "<< std::hex << "(" << j.first << ")" <<
 						i.first<<":"<<
 						i.second<<":"<< 
 						k->id_<<":"<<std::endl;
@@ -107,7 +107,10 @@ public:
 #endif
 
     void on_state(vsomeip::state_type_e _state) {
+		std::cout << "On state: now "<<(uint8_t)(_state) << std::endl; 
         if (_state == vsomeip::state_type_e::ST_REGISTERED) {
+			std::cout << "Will request service " <<
+				std::hex << SAMPLE_SERVICE_ID<<":"<< SAMPLE_INSTANCE_ID << std::endl;
             app_->request_service(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID);
         }
     }
