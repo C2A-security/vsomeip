@@ -34,6 +34,51 @@ public:
                     _use_tcp) {
     }
 
+	void subscribe(bool state_change)
+		{
+			static bool first_time = true;
+			
+			for (auto i : configuration_->get_local_services()) {
+				std::cout << "Registering message handler for instance "<<std::hex <<i.second<<std::endl;
+				if (first_time)
+				app_->register_message_handler(
+					vsomeip::ANY_SERVICE, //i.first,
+					i.second, 
+					vsomeip::ANY_METHOD, //SAMPLE_GET_METHOD_ID,
+					std::bind(&client_sample::on_message, this,
+							  std::placeholders::_1));
+				if (first_time)
+				app_->register_availability_handler(i.first, i.second,
+													std::bind(&client_sample::on_availability,
+															  this,
+															  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
+				auto service = configuration_->find_service(i.first, i.second);
+			
+				for (auto j : service->eventgroups_)
+				{
+					std::set<vsomeip::eventgroup_t> its_groups;
+					its_groups.insert(j.first);
+					for (auto k : j.second->events_)
+					{
+						std::cout << "Will request event "<< std::hex << "(" << j.first << ")" <<
+							i.first<<":"<<
+							i.second<<":"<< 
+							k->id_<<":"<<std::endl;
+
+						app_->request_event(
+							i.first,
+							i.second, 
+							k->id_,
+							its_groups,
+							vsomeip::event_type_e::ET_FIELD);
+
+					}
+					app_->subscribe(i.first, i.second, j.first);
+				}
+			}
+			first_time = false;
+		}
     bool init() {
         if (!app_->init()) {
             std::cerr << "Couldn't initialize application" << std::endl;
@@ -48,44 +93,7 @@ public:
         app_->register_state_handler(
                 std::bind(&client_sample::on_state, this,
                         std::placeholders::_1));
-		for (auto i : configuration_->get_local_services()) {
-			std::cout << "Registering message handler for instance "<<std::hex <<i.second<<std::endl;
-			app_->register_message_handler(
-                vsomeip::ANY_SERVICE, //i.first,
-                i.second, 
-                vsomeip::ANY_METHOD, //SAMPLE_GET_METHOD_ID,
-                std::bind(&client_sample::on_message, this,
-                          std::placeholders::_1));
-			
-			app_->register_availability_handler(i.first, i.second,
-												std::bind(&client_sample::on_availability,
-														  this,
-														  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-
-			auto service = configuration_->find_service(i.first, i.second);
-			
-			for (auto j : service->eventgroups_)
-			{
-				std::set<vsomeip::eventgroup_t> its_groups;
-				its_groups.insert(j.first);
-				for (auto k : j.second->events_)
-				{
-					std::cout << "Will request event "<< std::hex << "(" << j.first << ")" <<
-						i.first<<":"<<
-						i.second<<":"<< 
-						k->id_<<":"<<std::endl;
-
-					app_->request_event(
-						i.first,
-						i.second, 
-						k->id_,
-						its_groups,
-						vsomeip::event_type_e::ET_FIELD);
-					
-					app_->subscribe(i.first, i.second, j.first);
-				}
-			}
-		}
+		subscribe(false);
         return true;
     }
 
@@ -116,11 +124,15 @@ public:
     }
 
     void on_availability(vsomeip::service_t _service, vsomeip::instance_t _instance, bool _is_available) {
+		static bool last_a = false;
         std::cout << "Service ["
                 << std::setw(4) << std::setfill('0') << std::hex << _service << "." << _instance
                 << "] is "
                 << (_is_available ? "available." : "NOT available.")
                 << std::endl;
+		if (_is_available && !last_a)
+			subscribe(true);
+		last_a = _is_available;
     }
 
     void on_message(const std::shared_ptr<vsomeip::message> &_response) {
