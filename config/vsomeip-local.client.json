@@ -1,10 +1,10 @@
 {
-    "unicast" : "10.42.0.124",
+    "unicast" : "10.42.0.1",
     "logging" :
     { 
         "level" : "debug",
         "console" : "true",
-        "file" : { "enable" : "false", "path" : "/tmp/vsomeip.log" },
+        "file" : { "enable" : "true", "path" : "/tmp/vsomeip.log" },
         "dlt" : "false"
     },
     "applications" : 
