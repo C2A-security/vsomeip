@@ -179,8 +179,8 @@ public:
             std::lock_guard<std::mutex> its_lock(payload_mutex_);
             its_response->set_payload(payload_);
         }
-		std::cout << "On get will respond for "<< std::hex << 
-			_message->get_service() <<":"<< _message->get_instance() << std::endl;
+		/* std::cout << "On get will respond for "<< std::hex <<  */
+		/* 	_message->get_service() <<":"<< _message->get_instance() << std::endl; */
         app_->send(its_response);
     }
 
@@ -201,7 +201,7 @@ public:
 		{
 			event_ = service_->eventgroups_.begin()->second->events_.begin()->get()->id_ ; // ilya come here
 		}
-		std::cout << "On set will notify event id "<< std::hex << event_ << std::endl;
+//		std::cout << "On set will notify event id "<< std::hex << event_ << std::endl;
 
         app_->notify(_message->get_service(), _message->get_instance(),
                      event_, payload_);
@@ -272,10 +272,10 @@ public:
 									std::lock_guard<std::mutex> its_lock(payload_mutex_);
 									payload_->set_data(its_data, its_size);
 						
-									std::cout << "Setting event "<<std::hex <<
-										i.first.first<<":"<< i.first.second<<":"<<
-										event_ <<
-										"(Length=" << std::dec << its_size << ")." << std::endl;
+									/* std::cout << "Setting event "<<std::hex << */
+									/* 	i.first.first<<":"<< i.first.second<<":"<< */
+									/* 	event_ << */
+									/* 	"(Length=" << std::dec << its_size << ")." << std::endl; */
 									app_->notify(i.first.first, i.first.second, event_, payload_);
 								}
 								its_size++;

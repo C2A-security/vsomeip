@@ -61,10 +61,10 @@ public:
 					its_groups.insert(j.first);
 					for (auto k : j.second->events_)
 					{
-						std::cout << "Will request event "<< std::hex << "(" << j.first << ")" <<
-							i.first<<":"<<
-							i.second<<":"<< 
-							k->id_<<":"<<std::endl;
+						/* std::cout << "Will request event "<< std::hex << "(" << j.first << ")" << */
+						/* 	i.first<<":"<< */
+						/* 	i.second<<":"<<  */
+						/* 	k->id_<<":"<<std::endl; */
 
 						app_->request_event(
 							i.first,
@@ -85,6 +85,13 @@ public:
             return false;
         }
 		configuration_ = app_->get_configuration();
+		std::cout << "Got configuration "<<std::endl;
+
+		for (auto i : configuration_->get_remote_services()) {
+			auto service = configuration_->find_service(i.first, i.second);
+			service_map.insert(std::make_pair(i, service));
+			std::cout << "Got service "<<std::hex<<i.first<<":"<<i.second<<std::endl;
+		}
         std::cout << "Client settings [protocol="
                 << (use_tcp_ ? "TCP" : "UDP")
                 << "]"
@@ -115,11 +122,16 @@ public:
 #endif
 
     void on_state(vsomeip::state_type_e _state) {
-		std::cout << "On state: now "<<(uint8_t)(_state) << std::endl; 
+        std::cout << "Application " << app_->get_name() << " is "
+        << (_state == vsomeip::state_type_e::ST_REGISTERED ?
+                "registered." : "deregistered.") << std::endl;
         if (_state == vsomeip::state_type_e::ST_REGISTERED) {
-			std::cout << "Will request service " <<
-				std::hex << SAMPLE_SERVICE_ID<<":"<< SAMPLE_INSTANCE_ID << std::endl;
-            app_->request_service(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID);
+			for (auto i : service_map)
+			{
+				std::cout << "Will request service " <<
+					std::hex << i.first.first<<":"<< i.first.second << std::endl;
+				app_->request_service(i.first.first, i.first.second);
+			}
         }
     }
 
@@ -165,6 +177,7 @@ public:
                 its_get->set_instance(SAMPLE_INSTANCE_ID);
                 its_get->set_method(SAMPLE_GET_METHOD_ID);
                 its_get->set_reliable(use_tcp_);
+//				std::cout << "Will send get" << std::endl;
                 app_->send(its_get);
             }
 
@@ -183,6 +196,7 @@ public:
                     = vsomeip::runtime::get()->create_payload();
                 its_set_payload->set_data(its_data, sizeof(its_data));
                 its_set->set_payload(its_set_payload);
+//				std::cout << "Will send set" << std::endl;
                 app_->send(its_set);
             }
         }
@@ -191,6 +205,8 @@ public:
 private:
     std::shared_ptr< vsomeip::application > app_;
     std::shared_ptr<vsomeip_v3::configuration> configuration_;
+	std::map<std::pair<vsomeip_v3::service_t, vsomeip_v3::instance_t>, std::shared_ptr<vsomeip_v3::cfg::service>> service_map;
+
     bool use_tcp_;
 };
 

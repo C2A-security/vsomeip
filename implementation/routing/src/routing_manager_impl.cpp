@@ -341,6 +341,7 @@ bool routing_manager_impl::offer_service(client_t _client,
         if (!insert_offer_command(_service, _instance, VSOMEIP_OFFER_SERVICE,
                 _client, _major, _minor)) {
             return false;
+			VSOMEIP_INFO << "OFFER queued";
         }
     }
 
@@ -384,6 +385,8 @@ bool routing_manager_impl::offer_service(client_t _client,
         std::shared_ptr<serviceinfo> its_info = find_service(_service, _instance);
         if (its_info) {
             discovery_->offer_service(its_info);
+			VSOMEIP_INFO << "OFFER at discovery done";
+
         }
     }
 
@@ -435,6 +438,7 @@ void routing_manager_impl::stop_offer_service(client_t _client,
                 _client, _major, _minor)) {
             return;
         }
+		VSOMEIP_INFO << "STOP OFFER queued";
     }
 
     bool is_local(false);
