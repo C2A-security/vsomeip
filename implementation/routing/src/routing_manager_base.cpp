@@ -849,6 +849,7 @@ bool routing_manager_base::send(client_t _client,
     } else {
         VSOMEIP_ERROR << "Failed to serialize message. Check message size!";
     }
+///	std::cout << ((is_sent)?"sent":"not sent") << std::endl;
     return (is_sent);
 }
 

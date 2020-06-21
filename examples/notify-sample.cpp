@@ -40,11 +40,12 @@ struct service_info {
 
 class service_sample {
 public:
-    service_sample(bool _use_tcp, uint32_t _cycle) :
+    service_sample(bool _use_tcp, uint32_t _cycle, bool _use_static_routing) :
             app_(vsomeip::runtime::get()->create_application()),
             is_registered_(false),
             use_tcp_(_use_tcp),
             cycle_(_cycle),
+            use_static_routing_(_use_static_routing),			
             blocked_(false),
             running_(true),
             is_offered_(false),
@@ -99,7 +100,7 @@ public:
 						k->id_,
 						its_groups,
 						vsomeip::event_type_e::ET_FIELD,
-						std::chrono::milliseconds::zero(), // cycle
+						k->update_cycle_, //std::chrono::milliseconds::zero(), // cycle
 						false, // change resets cycle
 						true, // update on change
 						nullptr, // epsilon change func
@@ -155,7 +156,6 @@ public:
 		for (auto i : service_map)		
 			app_->stop_offer_service(i.first.first, i.first.second);
         is_offered_ = false;
-        notify_condition_.notify_one();
     }
 
     void on_state(vsomeip::state_type_e _state) {
@@ -213,22 +213,20 @@ public:
             condition_.wait(its_lock);
 
         bool is_offer(true);
-        while (running_) {
-            if (is_offer)
-            {
-				offer();
-				for (int i = 0; i < 10 && running_; i++)
-					std::this_thread::sleep_for(std::chrono::milliseconds(200));
-			}
-            else
-			{
-// ilya wth
-				stop_offer();
-				for (int i = 0; i < 10 && running_; i++)
-					std::this_thread::sleep_for(std::chrono::milliseconds(200));
-			}
+		if (use_static_routing_) {
+            offer();
+            while (running_);
+        } else {
+            while (running_) {
+                if (is_offer)
+                    offer();
+                else
+                    stop_offer();
 
-            is_offer = !is_offer;
+                for (int i = 0; i < 10 && running_; i++)
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                is_offer = !is_offer;
+            }
         }
     }
 
@@ -297,6 +295,7 @@ private:
     bool is_registered_;
     bool use_tcp_;
     uint32_t cycle_;
+    bool use_static_routing_;
 
     std::mutex mutex_;
     std::condition_variable condition_;
@@ -327,32 +326,39 @@ private:
 #endif
 
 int main(int argc, char **argv) {
+    bool use_static_routing(false);
     bool use_tcp = false;
-    uint32_t cycle = 2000; // default 1/2 s
+    uint32_t cycle = 1000; // default 1s
 
     std::string tcp_enable("--tcp");
     std::string udp_enable("--udp");
     std::string cycle_arg("--cycle");
+    std::string static_routing_enable("--static-routing");
 
     for (int i = 1; i < argc; i++) {
         if (tcp_enable == argv[i]) {
             use_tcp = true;
             break;
         }
-        if (udp_enable == argv[i]) {
+        else if (udp_enable == argv[i]) {
             use_tcp = false;
             break;
         }
+        else if (static_routing_enable == argv[i]) {
+            use_static_routing = true;
+        }
 
-        if (cycle_arg == argv[i] && i + 1 < argc) {
+        else if (cycle_arg == argv[i] && i + 1 < argc) {
             i++;
             std::stringstream converter;
             converter << argv[i];
             converter >> cycle;
         }
+		else
+			std::cerr << "Unknown arg ignored! " << argv[i] << std::endl;
     }
 
-    service_sample its_sample(use_tcp, cycle);
+    service_sample its_sample(use_tcp, cycle, use_static_routing);
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     its_sample_ptr = &its_sample;
     signal(SIGINT, handle_signal);

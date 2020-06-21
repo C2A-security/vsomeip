@@ -1563,6 +1563,7 @@ void configuration_impl::load_event(
     for (auto i = _tree.begin(); i != _tree.end(); ++i) {
         event_t its_event_id(0);
         bool its_is_field(false);
+		unsigned int its_update_cycle(0); // todo cast to milli ilya
         reliability_type_e its_reliability(reliability_type_e::RT_UNKNOWN);
 
         for (auto j = i->second.begin(); j != i->second.end(); ++j) {
@@ -1578,6 +1579,16 @@ void configuration_impl::load_event(
                 its_converter >> its_event_id;
             } else if (its_key == "is_field") {
                 its_is_field = (its_value == "true");
+            } else if (its_key == "is_field") {
+                its_is_field = (its_value == "true");
+            } else if (its_key == "update_cycle") {
+                std::stringstream its_converter;
+				if (its_value.size() > 1 && its_value[0] == '0' && its_value[1] == 'x') {
+                    its_converter << std::hex << its_value;
+                } else {
+                    its_converter << std::dec << its_value;
+                }
+                its_converter >> its_update_cycle; // ilya
             } else if (its_key == "is_reliable") {
                 if (its_value == "true")
                     its_reliability = reliability_type_e::RT_RELIABLE;
@@ -1610,7 +1621,7 @@ void configuration_impl::load_event(
                 }
 
                 std::shared_ptr<event> its_event = std::make_shared<event>(
-                        its_event_id, its_is_field, its_reliability);
+					its_event_id, its_is_field, its_reliability, its_update_cycle);
                 _service->events_[its_event_id] = its_event;
             }
         }
@@ -1676,7 +1687,7 @@ void configuration_impl::load_eventgroup(
                             its_event = find_event->second;
                         } else {
                             its_event = std::make_shared<event>(its_event_id,
-                                            false, reliability_type_e::RT_UNRELIABLE);
+																false, reliability_type_e::RT_UNRELIABLE, 0);
                         }
                         if (its_event) {
                             its_event->groups_.push_back(its_eventgroup);

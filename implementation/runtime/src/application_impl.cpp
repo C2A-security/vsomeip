@@ -840,6 +840,8 @@ void application_impl::notify(service_t _service, instance_t _instance,
         event_t _event, std::shared_ptr<payload> _payload, bool _force) const {
     if (routing_)
         routing_->notify(_service, _instance, _event, _payload, _force);
+	else
+		std::cerr << "No routing, no notify" << std::endl;
 }
 
 void application_impl::notify_one(service_t _service, instance_t _instance,
