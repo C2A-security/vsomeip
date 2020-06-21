@@ -14,7 +14,7 @@
 #include <mutex>
 
 #include <vsomeip/vsomeip.hpp>
-#include "implementation/configuration/include/configuration.hpp"
+#include "configuration/include/configuration.hpp"
 /* #ifdef VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS */
 /* #include "implementation/configuration/include/configuration_impl.hpp" */
 /* #else */
@@ -22,9 +22,9 @@
 /* #include "implementation/configuration/include/configuration_plugin.hpp" */
 /* #endif // VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS */
 //#include <implementation/configuration/include/service.hpp>
-#include <implementation/configuration/include/eventgroup.hpp>
-#include <implementation/configuration/include/event.hpp>
-#include <implementation/configuration/include/service.hpp>
+#include <configuration/include/eventgroup.hpp>
+#include <configuration/include/event.hpp>
+#include <configuration/include/service.hpp>
 #include "sample-ids.hpp"
 
 struct service_info {
@@ -222,7 +222,8 @@ public:
 			}
             else
 			{
-// ilya wth                stop_offer();
+// ilya wth
+				stop_offer();
 				for (int i = 0; i < 10 && running_; i++)
 					std::this_thread::sleep_for(std::chrono::milliseconds(200));
 			}
@@ -235,10 +236,10 @@ public:
 		
         std::shared_ptr<vsomeip::message> its_message
             = vsomeip::runtime::get()->create_request(use_tcp_);
-		vsomeip::byte_t its_data[10];
+//		vsomeip::byte_t payload_data[10];
 		uint32_t its_size = 1;
-		for (uint32_t i = 0; i < 10; ++i)
-			its_data[i] = static_cast<uint8_t>(i+1);
+//		for (uint32_t i = 0; i < 10; ++i)
+//			payload_data[i] = static_cast<uint8_t>(i+1);
 		while (running_) {
 
 			for (auto i : service_map)
@@ -263,14 +264,14 @@ public:
 							while (!is_offered_ && running_)
 								notify_condition_.wait(its_lock);
 							while (is_offered_ && running_) {
-								if (its_size == sizeof(its_data))
+								if (its_size == sizeof(payload_data))
 								{
 									its_size = 1;
 									break;
 								}
 								{
 									std::lock_guard<std::mutex> its_lock(payload_mutex_);
-									payload_->set_data(its_data, its_size);
+									payload_->set_data(payload_data, its_size);
 						
 									/* std::cout << "Setting event "<<std::hex << */
 									/* 	i.first.first<<":"<< i.first.second<<":"<< */

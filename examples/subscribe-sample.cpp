@@ -17,13 +17,13 @@
 #ifdef VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS
 #include "implementation/configuration/include/configuration_impl.hpp"
 #else
-#include "implementation/configuration/include/configuration.hpp"
-#include "implementation/configuration/include/configuration_plugin.hpp"
+#include "configuration/include/configuration.hpp"
+#include "configuration/include/configuration_plugin.hpp"
 #endif // VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS
 
-#include <implementation/configuration/include/service.hpp>
-#include <implementation/configuration/include/eventgroup.hpp>
-#include <implementation/configuration/include/event.hpp>
+#include <configuration/include/service.hpp>
+#include <configuration/include/eventgroup.hpp>
+#include <configuration/include/event.hpp>
 
 #include "sample-ids.hpp"
 
@@ -189,12 +189,12 @@ public:
                 its_set->set_method(SAMPLE_SET_METHOD_ID);
                 its_set->set_reliable(use_tcp_);
 
-                const vsomeip::byte_t its_data[]
+                const vsomeip::byte_t set_data[]
                     = { 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
                         0x48, 0x49, 0x50, 0x51, 0x52 };
                 std::shared_ptr<vsomeip::payload> its_set_payload
                     = vsomeip::runtime::get()->create_payload();
-                its_set_payload->set_data(its_data, sizeof(its_data));
+                its_set_payload->set_data(set_data, sizeof(set_data));
                 its_set->set_payload(its_set_payload);
 //				std::cout << "Will send set" << std::endl;
                 app_->send(its_set);

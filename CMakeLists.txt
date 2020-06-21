@@ -199,6 +199,7 @@ endif ()
 
 include_directories(
     interface
+	implementation
     ${VSOMEIP_BOOST_HELPER}
     ${DLT_INCLUDE_DIRS}
 )
