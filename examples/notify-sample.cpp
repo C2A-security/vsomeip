@@ -263,7 +263,7 @@ public:
 						{
 							event_ = k->id_ ;
 							{
-								if (its_size == sizeof(payload_data))
+								if (its_size > sizeof(payload_data))
 								{
 									its_size = 1;
 									break;

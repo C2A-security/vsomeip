@@ -38,22 +38,22 @@ public:
 		{
 			static bool first_time = true;
 			
-			for (auto i : configuration_->get_local_services()) {
-				std::cout << "Registering message handler for instance "<<std::hex <<i.second<<std::endl;
+			for (auto i : service_map) {
+				std::cout << "Registering message handler for instance "<<std::hex <<i.first.second<<std::endl;
 				if (first_time)
 				app_->register_message_handler(
 					vsomeip::ANY_SERVICE, //i.first,
-					i.second, 
+					i.first.second, 
 					vsomeip::ANY_METHOD, //SAMPLE_GET_METHOD_ID,
 					std::bind(&client_sample::on_message, this,
 							  std::placeholders::_1));
 				if (first_time)
-				app_->register_availability_handler(i.first, i.second,
-													std::bind(&client_sample::on_availability,
-															  this,
-															  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+					app_->register_availability_handler(i.first.first, i.first.second,
+														std::bind(&client_sample::on_availability,
+																  this,
+																  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-				auto service = configuration_->find_service(i.first, i.second);
+				auto service = i.second;
 			
 				for (auto j : service->eventgroups_)
 				{
@@ -67,17 +67,44 @@ public:
 						/* 	k->id_<<":"<<std::endl; */
 
 						app_->request_event(
-							i.first,
-							i.second, 
+							i.first.first,
+							i.first.second, 
 							k->id_,
 							its_groups,
 							vsomeip::event_type_e::ET_FIELD);
-
 					}
-					app_->subscribe(i.first, i.second, j.first);
+					app_->subscribe(i.first.first, i.first.second, j.first);
 				}
 			}
 			first_time = false;
+		}
+	void unsubscribe()
+		{
+			
+			for (auto i : service_map) {
+				auto service = i.second;
+			
+				for (auto j : service->eventgroups_)
+				{
+					std::set<vsomeip::eventgroup_t> its_groups;
+					its_groups.insert(j.first);
+					for (auto k : j.second->events_)
+					{
+						/* std::cout << "Will request event "<< std::hex << "(" << j.first << ")" << */
+						/* 	i.first<<":"<< */
+						/* 	i.second<<":"<<  */
+						/* 	k->id_<<":"<<std::endl; */
+
+						/* app_->request_event( */
+						/* 	i.first.first, */
+						/* 	i.first.second,  */
+						/* 	k->id_, */
+						/* 	its_groups, */
+						/* 	vsomeip::event_type_e::ET_FIELD); */
+					}
+					app_->unsubscribe(i.first.first, i.first.second, j.first);
+				}
+			}
 		}
     bool init() {
         if (!app_->init()) {
@@ -87,7 +114,7 @@ public:
 		configuration_ = app_->get_configuration();
 		std::cout << "Got configuration "<<std::endl;
 
-		for (auto i : configuration_->get_remote_services()) {
+		for (auto i : configuration_->get_local_services()) {
 			auto service = configuration_->find_service(i.first, i.second);
 			service_map.insert(std::make_pair(i, service));
 			std::cout << "Got service "<<std::hex<<i.first<<":"<<i.second<<std::endl;
@@ -144,6 +171,8 @@ public:
                 << std::endl;
 		if (_is_available && !last_a)
 			subscribe(true);
+		else
+			unsubscribe();
 		last_a = _is_available;
     }
 
