@@ -81,37 +81,35 @@ public:
 			auto service = configuration_->find_service(i.first, i.second);
 			service_map.insert(std::make_pair(i, service));
 			std::cout << "Got service "<<std::hex<<i.first<<":"<<i.second<<std::endl;
-			for (auto j : service->eventgroups_)
+			for (auto j : service->events_)
 			{
-				if (!j.first)
-					continue;
 				std::set<vsomeip::eventgroup_t> its_groups;
-				its_groups.insert(j.first);
-				for (auto k : j.second->events_)
+				for (auto k : j.second->groups_)
 				{
-					std::cout << "Will offer event "<<std::hex<<
-						i.first<<":"<<
-						i.second<<":"<< 
-						k->id_<<":"<<
-						"("<<k->update_cycle_.count()<<")"<<
-						std::endl;
-					
-					app_->offer_event(
-						i.first,
-						i.second, 
-						k->id_,
-						its_groups,
-						vsomeip::event_type_e::ET_FIELD,
-						k->update_cycle_, //std::chrono::milliseconds::zero(), // cycle
-						false, // change resets cycle
-						true, // update on change
-						nullptr, // epsilon change func
-						k->reliability_);
-					/* { */
-					/* 	std::lock_guard<std::mutex> its_lock(payload_mutex_); */
-					/* 	payload_ = vsomeip::runtime::get()->create_payload(); */
-					/* } */
+					its_groups.insert(j.first);
 				}
+				std::cout << "Will offer event "<<std::hex<<
+					i.first<<":"<<
+					i.second<<":"<< 
+					j.second->id_<<":"<<
+					"("<<j.second->update_cycle_.count()<<")"<<
+					std::endl;
+					
+				app_->offer_event(
+					i.first,
+					i.second, 
+					j.second->id_,
+					its_groups,
+					vsomeip::event_type_e::ET_FIELD,
+					j.second->update_cycle_, //std::chrono::milliseconds::zero(), // cycle
+					false, // change resets cycle
+					true, // update on change
+					nullptr, // epsilon change func
+					j.second->reliability_);
+				/* { */
+				/* 	std::lock_guard<std::mutex> its_lock(payload_mutex_); */
+				/* 	payload_ = vsomeip::runtime::get()->create_payload(); */
+				/* } */				
 			}
 		}
         {
