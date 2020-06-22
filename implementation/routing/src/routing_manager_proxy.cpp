@@ -2062,17 +2062,21 @@ void routing_manager_proxy::send_register_event(client_t _client,
         std::lock_guard<std::mutex> its_lock(sender_mutex_);
         if (sender_) {
             sender_->send(its_command, static_cast<std::uint32_t>(its_eventgroups_size));
+			//if (_is_provided)
+			{
+				VSOMEIP_INFO << "REGISTER EVENT("
+							 << std::hex << std::setw(4) << std::setfill('0') << client_ << "): ["
+							 << std::hex << std::setw(4) << std::setfill('0') << _service << "."
+							 << std::hex << std::setw(4) << std::setfill('0') << _instance << "."
+							 << std::hex << std::setw(4) << std::setfill('0') << _notifier
+							 << ":is_provider=" << std::boolalpha << _is_provided
+//							 << ":cycle=" << _cycle.count() <<
+							 << "]";
+			}
         }
     }
 
-    if (_is_provided) {
-        VSOMEIP_INFO << "REGISTER EVENT("
-            << std::hex << std::setw(4) << std::setfill('0') << client_ << "): ["
-            << std::hex << std::setw(4) << std::setfill('0') << _service << "."
-            << std::hex << std::setw(4) << std::setfill('0') << _instance << "."
-            << std::hex << std::setw(4) << std::setfill('0') << _notifier
-            << ":is_provider=" << _is_provided << "]";
-    }
+    
 
     delete[] its_command;
 }

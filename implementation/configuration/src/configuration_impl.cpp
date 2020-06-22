@@ -1581,7 +1581,7 @@ void configuration_impl::load_event(
                 its_is_field = (its_value == "true");
             } else if (its_key == "is_field") {
                 its_is_field = (its_value == "true");
-            } else if (its_key == "update_cycle") {
+            } else if (its_key == "update-cycle") {
                 std::stringstream its_converter;
 				if (its_value.size() > 1 && its_value[0] == '0' && its_value[1] == 'x') {
                     its_converter << std::hex << its_value;
@@ -2447,6 +2447,7 @@ std::set<std::pair<service_t, instance_t> >
 configuration_impl::get_remote_services() const {
     std::lock_guard<std::mutex> its_lock(services_mutex_);
     std::set<std::pair<service_t, instance_t> > its_remote_services;
+	VSOMEIP_DEBUG << "Configuration : "<<services_.size() << " total services";
     for (const auto& i : services_) {
         for (const auto& j : i.second) {
             if (is_remote(j.second)) {
@@ -2454,6 +2455,7 @@ configuration_impl::get_remote_services() const {
             }
         }
     }
+	VSOMEIP_DEBUG << "Configuration : "<< its_remote_services.size() << " remote services";
     return its_remote_services;
 }
 
@@ -2461,7 +2463,7 @@ std::set<std::pair<service_t, instance_t> >
 configuration_impl::get_local_services() const {
     std::lock_guard<std::mutex> its_lock(services_mutex_);
     std::set<std::pair<service_t, instance_t> > its_local_services;
-	std::cout << "Configuration : total "<<services_.size() << std::endl;
+	VSOMEIP_DEBUG << "Configuration : "<<services_.size() << " total services";
     for (const auto& i : services_) {
         for (const auto& j : i.second) {
             if (!is_remote(j.second) && !is_internal_service(i.first, j.first)) {
@@ -2469,6 +2471,7 @@ configuration_impl::get_local_services() const {
             }
         }
     }
+	VSOMEIP_DEBUG << "Configuration : "<< its_local_services.size() << " local services";
     return its_local_services;
 }
 	

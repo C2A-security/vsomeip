@@ -1075,7 +1075,7 @@ void routing_manager_impl::register_event(client_t _client,
         std::chrono::milliseconds _cycle, bool _change_resets_cycle,
         bool _update_on_change,
         epsilon_change_func_t _epsilon_change_func,
-        bool _is_provided, bool _is_shadow, bool _is_cache_placeholder) {
+										  bool _is_provided, bool _is_shadow, bool _is_cache_placeholder) {
     auto its_event = find_event(_service, _instance, _notifier);
     bool is_first(false);
     if (its_event) {
@@ -1087,19 +1087,21 @@ void routing_manager_impl::register_event(client_t _client,
     }
     if (is_first) {
         routing_manager_base::register_event(_client,
-                _service, _instance,
-                _notifier,
-                _eventgroups, _type, _reliability,
-                _cycle, _change_resets_cycle, _update_on_change,
-                _epsilon_change_func, _is_provided, _is_shadow,
-                _is_cache_placeholder);
+											 _service, _instance,
+											 _notifier,
+											 _eventgroups, _type, _reliability,
+											 _cycle, _change_resets_cycle, _update_on_change,
+											 _epsilon_change_func, _is_provided, _is_shadow,
+											 _is_cache_placeholder);
     }
     VSOMEIP_INFO << "REGISTER EVENT("
-        << std::hex << std::setw(4) << std::setfill('0') << _client << "): ["
-        << std::hex << std::setw(4) << std::setfill('0') << _service << "."
-        << std::hex << std::setw(4) << std::setfill('0') << _instance << "."
-        << std::hex << std::setw(4) << std::setfill('0') << _notifier
-        << ":is_provider=" << std::boolalpha << _is_provided << "]";
+				 << std::hex << std::setw(4) << std::setfill('0') << _client << "): ["
+				 << std::hex << std::setw(4) << std::setfill('0') << _service << "."
+				 << std::hex << std::setw(4) << std::setfill('0') << _instance << "."
+				 << std::hex << std::setw(4) << std::setfill('0') << _notifier
+				 << ":is_provider=" << std::boolalpha << _is_provided
+				 << ":cycle=" << _cycle.count() 
+				 << "]";
 }
 
 void routing_manager_impl::register_shadow_event(client_t _client,

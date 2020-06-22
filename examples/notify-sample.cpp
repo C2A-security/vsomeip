@@ -40,12 +40,12 @@ struct service_info {
 
 class service_sample {
 public:
-    service_sample(bool _use_tcp, uint32_t _cycle, bool _use_static_routing) :
+    service_sample(bool _use_tcp, uint32_t _cycle, bool _use_dynamic_routing) :
             app_(vsomeip::runtime::get()->create_application()),
             is_registered_(false),
             use_tcp_(_use_tcp),
             cycle_(_cycle),
-            use_static_routing_(_use_static_routing),			
+            use_dynamic_routing_(_use_dynamic_routing),			
             blocked_(false),
             running_(true),
             is_offered_(false),
@@ -92,7 +92,9 @@ public:
 					std::cout << "Will offer event "<<std::hex<<
 						i.first<<":"<<
 						i.second<<":"<< 
-						k->id_<<":"<<std::endl;
+						k->id_<<":"<<
+						"("<<k->update_cycle_.count()<<")"<<
+						std::endl;
 					
 					app_->offer_event(
 						i.first,
@@ -213,7 +215,7 @@ public:
             condition_.wait(its_lock);
 
         bool is_offer(true);
-		if (use_static_routing_) {
+		if (!use_dynamic_routing_) {
             offer();
             while (running_);
         } else {
@@ -238,8 +240,11 @@ public:
 		uint32_t its_size = 1;
 //		for (uint32_t i = 0; i < 10; ++i)
 //			payload_data[i] = static_cast<uint8_t>(i+1);
-		while (running_) {
-
+		std::unique_lock<std::mutex> its_lock(notify_mutex_);
+		while (!is_offered_ && running_)
+			notify_condition_.wait(its_lock);
+		while (is_offered_ && running_)
+		{
 			for (auto i : service_map)
 			{			
 				its_message->set_service(i.first.first);
@@ -257,11 +262,7 @@ public:
 						for (auto k : j.second->events_)
 						{
 							event_ = k->id_ ;
-			
-							std::unique_lock<std::mutex> its_lock(notify_mutex_);
-							while (!is_offered_ && running_)
-								notify_condition_.wait(its_lock);
-							while (is_offered_ && running_) {
+							{
 								if (its_size == sizeof(payload_data))
 								{
 									its_size = 1;
@@ -269,8 +270,7 @@ public:
 								}
 								{
 									std::lock_guard<std::mutex> its_lock(payload_mutex_);
-									payload_->set_data(payload_data, its_size);
-						
+									payload_->set_data(payload_data, its_size);						
 									/* std::cout << "Setting event "<<std::hex << */
 									/* 	i.first.first<<":"<< i.first.second<<":"<< */
 									/* 	event_ << */
@@ -281,12 +281,10 @@ public:
 							}
 						}
 					}
-
 				}
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(cycle_));
-
 		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(cycle_));
     }
 
 private:
@@ -295,7 +293,7 @@ private:
     bool is_registered_;
     bool use_tcp_;
     uint32_t cycle_;
-    bool use_static_routing_;
+    bool use_dynamic_routing_;
 
     std::mutex mutex_;
     std::condition_variable condition_;
@@ -326,14 +324,14 @@ private:
 #endif
 
 int main(int argc, char **argv) {
-    bool use_static_routing(false);
+    bool use_dynamic_routing(false);
     bool use_tcp = false;
     uint32_t cycle = 1000; // default 1s
 
     std::string tcp_enable("--tcp");
     std::string udp_enable("--udp");
     std::string cycle_arg("--cycle");
-    std::string static_routing_enable("--static-routing");
+    std::string dynamic_routing_enable("--dynamic-routing");
 
     for (int i = 1; i < argc; i++) {
         if (tcp_enable == argv[i]) {
@@ -344,8 +342,8 @@ int main(int argc, char **argv) {
             use_tcp = false;
             break;
         }
-        else if (static_routing_enable == argv[i]) {
-            use_static_routing = true;
+        else if (dynamic_routing_enable == argv[i]) {
+            use_dynamic_routing = true;
         }
 
         else if (cycle_arg == argv[i] && i + 1 < argc) {
@@ -358,7 +356,7 @@ int main(int argc, char **argv) {
 			std::cerr << "Unknown arg ignored! " << argv[i] << std::endl;
     }
 
-    service_sample its_sample(use_tcp, cycle, use_static_routing);
+    service_sample its_sample(use_tcp, cycle, use_dynamic_routing);
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     its_sample_ptr = &its_sample;
     signal(SIGINT, handle_signal);
