@@ -34,9 +34,9 @@ public:
                     _use_tcp) {
     }
 
-	void subscribe(bool state_change)
+	void subscribe(bool first_time)
 		{
-			static bool first_time = true;
+//			static bool first_time = true;
 			
 			for (auto i : service_map) {
 				std::cout << "Registering message handler for instance "<<std::hex <<i.first.second<<std::endl;
@@ -115,7 +115,7 @@ public:
         app_->register_state_handler(
                 std::bind(&client_sample::on_state, this,
                         std::placeholders::_1));
-		subscribe(false);
+		subscribe(true);
         return true;
     }
 
@@ -150,19 +150,20 @@ public:
         }
     }
 
-    void on_availability(vsomeip::service_t _service, vsomeip::instance_t _instance, bool _is_available) {
-		static bool last_a = false;
-        std::cout << "Service ["
-                << std::setw(4) << std::setfill('0') << std::hex << _service << "." << _instance
-                << "] is "
-                << (_is_available ? "available." : "NOT available.")
-                << std::endl;
-		if (_is_available && !last_a)
-			subscribe(true);
-		else
-			unsubscribe();
-		last_a = _is_available;
-    }
+    void on_availability(vsomeip::service_t _service, vsomeip::instance_t _instance, bool _is_available)
+		{
+			static bool last_a = false;
+			std::cout << "Service ["
+					  << std::setw(4) << std::setfill('0') << std::hex << _service << "." << _instance
+					  << "] is "
+					  << (_is_available ? "available." : "NOT available.")
+					  << std::endl;
+			if (_is_available && !last_a)
+				subscribe(false);
+			else if (last_a)
+				unsubscribe();
+			last_a = _is_available;
+		}
 
     void on_message(const std::shared_ptr<vsomeip::message> &_response) {
         std::stringstream its_message;
