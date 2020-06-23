@@ -80,6 +80,7 @@ public:
 			{
 				std::lock_guard<std::mutex> its_lock(payload_mutex_);
 				payload_ = vsomeip::runtime::get()->create_payload();
+				payload_->set_data(payload_data, sizeof(payload_data));
 			}
 			auto service = configuration_->find_service(i.first, i.second);
 			service_map.insert(std::make_pair(i, service));
@@ -87,11 +88,16 @@ public:
 			for (auto j : service->events_)
 			{
 				std::set<vsomeip::eventgroup_t> its_groups;
-				for (auto k : j.second->groups_)
+				for (auto k : j.second->groups_) // weak_ptr 
 				{
-					its_groups.insert(j.first);
+					if (auto eg = k.lock())
+					{
+						std::cout << "                  In group " << std::hex << eg->id_ << std::endl;
+						its_groups.insert(eg->id_);
+					}
+					//todo else error
 				}
-				std::cout << "Will offer event "<<std::hex<<
+				std::cout << "                  Will offer event "<<std::hex<<
 					i.first<<":"<<
 					i.second<<":"<< 
 					j.second->id_<<":"<<
