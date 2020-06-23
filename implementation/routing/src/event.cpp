@@ -267,6 +267,7 @@ void event::update_cbk(boost::system::error_code const &_error) {
     if (!_error) {
         std::lock_guard<std::mutex> its_lock(mutex_);
         cycle_timer_.expires_from_now(cycle_);
+		VSOMEIP_DEBUG << "Notifying by cycle callback "<< std::hex << get_event();
         notify();
         auto its_handler =
                 std::bind(&event::update_cbk, shared_from_this(),

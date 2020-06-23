@@ -39,7 +39,7 @@ public:
 //			static bool first_time = true;
 			
 			for (auto i : service_map) {
-				std::cout << "Registering message handler for instance "<<std::hex <<i.first.second<<std::endl;
+				VSOMEIP_INFO << "Registering message handler for instance "<<std::hex <<i.first.second;
 				if (first_time)
 				app_->register_message_handler(
 					vsomeip::ANY_SERVICE, //i.first,
@@ -185,7 +185,7 @@ public:
         for (uint32_t i = 0; i < its_payload->get_length(); ++i)
             its_message << std::hex << std::setw(2) << std::setfill('0')
                 << (int) its_payload->get_data()[i] << " ";
-        std::cout << its_message.str() << std::endl;
+        VSOMEIP_DEBUG << its_message.str();
 
         if (_response->get_client() == 0) {
             if ((its_payload->get_length() % 5) == 0) {
@@ -195,7 +195,7 @@ public:
                 its_get->set_instance(SAMPLE_INSTANCE_ID);
                 its_get->set_method(SAMPLE_GET_METHOD_ID);
                 its_get->set_reliable(use_tcp_);
-//				std::cout << "Will send get" << std::endl;
+				VSOMEIP_DEBUG << "Will send get" << std::endl;
                 app_->send(its_get);
             }
 
@@ -214,7 +214,7 @@ public:
                     = vsomeip::runtime::get()->create_payload();
                 its_set_payload->set_data(set_data, sizeof(set_data));
                 its_set->set_payload(its_set_payload);
-//				std::cout << "Will send set" << std::endl;
+				VSOMEIP_DEBUG << "Will send set";
                 app_->send(its_set);
             }
         }

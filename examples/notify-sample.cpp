@@ -122,7 +122,6 @@ public:
 			}
 		}
         
-
         blocked_ = true;
         condition_.notify_one();
         return true;
@@ -261,24 +260,34 @@ public:
 				{
 					for (auto j : service_->eventgroups_)
 					{
-						if (!j.first)
-							continue;
+//						if (!j.first)
+//							continue;
 						for (auto k : j.second->events_)
 						{
 							event_ = k->id_ ;
+/* 							if (k->update_cycle_.count()) */
+/* 							{ */
+/* //								app_->get_routing_manager()->find_event(i.first.first, i.first.second, event_)->set_payload(payload_, its_size); */
+/* 								app_->notify(i.first.first, i.first.second, event_, payload_); */
+/* 								continue; */
+/* 							} */
 							{
+								
 								if (its_size > sizeof(payload_data))
 								{
-									its_size = 1;
-									break;
+									its_size = 3;
 								}
+								
 								{
 									std::lock_guard<std::mutex> its_lock(payload_mutex_);
-									payload_->set_data(payload_data, its_size);						
+									payload_->set_data(payload_data, its_size);
+//									payload_->set_data((const uint8_t*)&event_, 2);
 									/* std::cout << "Setting event "<<std::hex << */
 									/* 	i.first.first<<":"<< i.first.second<<":"<< */
 									/* 	event_ << */
 									/* 	"(Length=" << std::dec << its_size << ")." << std::endl; */
+									VSOMEIP_DEBUG << "Notify by app cycle " << std::hex << event_;
+									/* std::cout << "Notify by app cycle " << std::hex << event_ << std::endl; */
 									app_->notify(i.first.first, i.first.second, event_, payload_);
 								}
 								its_size++;
