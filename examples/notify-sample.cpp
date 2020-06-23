@@ -287,8 +287,8 @@ public:
 					}
 				}
 			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(cycle_));
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(cycle_));
     }
 
 private:
