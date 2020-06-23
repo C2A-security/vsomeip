@@ -71,7 +71,8 @@ public:
 							i.first.second, 
 							k->id_,
 							its_groups,
-							vsomeip::event_type_e::ET_FIELD);
+							(k->is_field_) ?
+							vsomeip_v3::event_type_e::ET_FIELD : vsomeip_v3::event_type_e::ET_EVENT);
 					}
 					app_->subscribe(i.first.first, i.first.second, j.first);
 				}
@@ -83,25 +84,12 @@ public:
 			
 			for (auto i : service_map) {
 				auto service = i.second;
-			
+				for (auto j : service->events_)
+				{
+					app_->release_event(i.first.first, i.first.second, j.first);
+				}
 				for (auto j : service->eventgroups_)
 				{
-					std::set<vsomeip::eventgroup_t> its_groups;
-					its_groups.insert(j.first);
-					for (auto k : j.second->events_)
-					{
-						/* std::cout << "Will request event "<< std::hex << "(" << j.first << ")" << */
-						/* 	i.first<<":"<< */
-						/* 	i.second<<":"<<  */
-						/* 	k->id_<<":"<<std::endl; */
-
-						/* app_->request_event( */
-						/* 	i.first.first, */
-						/* 	i.first.second,  */
-						/* 	k->id_, */
-						/* 	its_groups, */
-						/* 	vsomeip::event_type_e::ET_FIELD); */
-					}
 					app_->unsubscribe(i.first.first, i.first.second, j.first);
 				}
 			}

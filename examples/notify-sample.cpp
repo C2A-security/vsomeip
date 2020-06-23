@@ -77,7 +77,10 @@ public:
                 SAMPLE_GET_METHOD_ID,
                 std::bind(&service_sample::on_get, this,
                           std::placeholders::_1));
-
+			{
+				std::lock_guard<std::mutex> its_lock(payload_mutex_);
+				payload_ = vsomeip::runtime::get()->create_payload();
+			}
 			auto service = configuration_->find_service(i.first, i.second);
 			service_map.insert(std::make_pair(i, service));
 			std::cout << "Got service "<<std::hex<<i.first<<":"<<i.second<<std::endl;
@@ -112,10 +115,7 @@ public:
 				/* } */				
 			}
 		}
-        {
-            std::lock_guard<std::mutex> its_lock(payload_mutex_);
-            payload_ = vsomeip::runtime::get()->create_payload();
-        }
+        
 
         blocked_ = true;
         condition_.notify_one();
@@ -334,6 +334,7 @@ int main(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
         if (tcp_enable == argv[i]) {
             use_tcp = true;
+			std::cout << "Will use tcp for requests" << std::endl;
             break;
         }
         else if (udp_enable == argv[i]) {
@@ -342,6 +343,7 @@ int main(int argc, char **argv) {
         }
         else if (dynamic_routing_enable == argv[i]) {
             use_dynamic_routing = true;
+			std::cout << "Will use dynamic routing (un/re-offering service[s])" << std::endl;
         }
 
         else if (cycle_arg == argv[i] && i + 1 < argc) {
