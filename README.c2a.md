@@ -7,7 +7,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ##### Build Instructions for Linux
 - See th README.md for dependencies
 
-- Compiling has to be done like this now:
+- Compiling has to be done like this now (from vsomeip_c2a directory):
 mkdir local # if you don't intend to install vsomeip libs system-wise
 mkdir build
 cd build
