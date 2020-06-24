@@ -16,6 +16,9 @@ make -j4
 cd examples
 make clean all
 
+
+***NOTE THIS HAS BEEN MADE A SUBMODULE of modular_network_simulator***
+
 - Change the unicast at the top and 'routing' of vsomeip-local.json to your device's IP and the application name you're running on it.
 
 - Add the muticast routes from this config with 'sudo route add -nv XXX.XXX.XXX.XXX <nic>'
