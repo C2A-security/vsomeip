@@ -29,9 +29,9 @@
 
 class client_sample {
 public:
-    client_sample(bool _use_tcp) :
+    client_sample(bool _use_tcp, uint32_t _do_methods) :
             app_(vsomeip::runtime::get()->create_application()), use_tcp_(
-                    _use_tcp) {
+				_use_tcp), do_methods_(_do_methods) {
     }
 
 	void subscribe(bool first_time)
@@ -108,8 +108,10 @@ public:
 			std::cout << "Got service "<<std::hex<<i.first<<":"<<i.second<<std::endl;
 		}
         std::cout << "Client settings [protocol="
-                << (use_tcp_ ? "TCP" : "UDP")
-                << "]"
+				  << (use_tcp_ ? "TCP" : "UDP")
+				  << (do_methods_ ? ", set/get once in " : ", use of methods: ")
+				  << (do_methods_ ? do_methods_ : 0 )
+				  << "]"
                 << std::endl;
 
         app_->register_state_handler(
@@ -187,8 +189,8 @@ public:
                 << (int) its_payload->get_data()[i] << " ";
         VSOMEIP_DEBUG << its_message.str();
 
-        if (_response->get_client() == 0) {
-            if ((its_payload->get_length() % 5) == 0) {
+        if (do_methods_ && _response->get_client() == 0) {
+            if ((its_payload->get_length() % do_methods_) == 0) {
                 std::shared_ptr<vsomeip::message> its_get
                     = vsomeip::runtime::get()->create_request();
                 its_get->set_service(SAMPLE_SERVICE_ID);
@@ -199,7 +201,7 @@ public:
                 app_->send(its_get);
             }
 
-            if ((its_payload->get_length() % 8) == 0) {
+            if ((its_payload->get_length() % (do_methods_+1)) == 0) {
                 std::shared_ptr<vsomeip::message> its_set
                     = vsomeip::runtime::get()->create_request();
                 its_set->set_service(SAMPLE_SERVICE_ID);
@@ -226,6 +228,7 @@ private:
 	std::map<std::pair<vsomeip_v3::service_t, vsomeip_v3::instance_t>, std::shared_ptr<vsomeip_v3::cfg::service>> service_map;
 
     bool use_tcp_;
+    uint32_t do_methods_;
 };
 
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
@@ -239,9 +242,10 @@ private:
 
 int main(int argc, char **argv) {
     bool use_tcp = false;
-
+	uint32_t do_methods = 0;
     std::string tcp_enable("--tcp");
     std::string udp_enable("--udp");
+    std::string methods_once_in("--methods");
 
     int i = 1;
     while (i < argc) {
@@ -250,10 +254,17 @@ int main(int argc, char **argv) {
         } else if (udp_enable == argv[i]) {
             use_tcp = false;
         }
-        i++;
+		else if (methods_once_in == argv[i]) {
+			std::stringstream converter;
+			converter << argv[i];
+			converter >> do_methods;
+		}
+		else
+			std::cerr << "Unknown arg ignored! " << argv[i] << std::endl;
+		i++;
     }
 
-    client_sample its_sample(use_tcp);
+client_sample its_sample(use_tcp, do_methods);
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     its_sample_ptr = &its_sample;
     signal(SIGINT, handle_signal);

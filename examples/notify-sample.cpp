@@ -15,36 +15,31 @@
 
 #include <vsomeip/vsomeip.hpp>
 #include "configuration/include/configuration.hpp"
-/* #ifdef VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS */
-/* #include "implementation/configuration/include/configuration_impl.hpp" */
-/* #else */
-/* #include "implementation/configuration/include/configuration.hpp" */
-/* #include "implementation/configuration/include/configuration_plugin.hpp" */
-/* #endif // VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS */
-//#include <implementation/configuration/include/service.hpp>
 #include <configuration/include/eventgroup.hpp>
 #include <configuration/include/event.hpp>
 #include <configuration/include/service.hpp>
 #include "sample-ids.hpp"
 
-struct service_info {
-    vsomeip::service_t service_id;
-    vsomeip::instance_t instance_id;
-    vsomeip::method_t method_id;
-    vsomeip::event_t event_id;
-    vsomeip::eventgroup_t eventgroup_id;
-    vsomeip::method_t shutdown_method_id;
-    vsomeip::method_t notify_method_id;
-};
+/* struct service_info { */
+/*     vsomeip::service_t service_id; */
+/*     vsomeip::instance_t instance_id; */
+/*     vsomeip::method_t method_id; */
+/*     vsomeip::event_t event_id; */
+/*     vsomeip::eventgroup_t eventgroup_id; */
+/*     vsomeip::method_t shutdown_method_id; */
+/*     vsomeip::method_t notify_method_id; */
+/* }; */
 
 
 class service_sample {
 public:
-    service_sample(bool _use_tcp, uint32_t _cycle, bool _use_dynamic_routing) :
+    service_sample(bool _use_tcp, uint32_t _cycle, uint32_t _size, bool _use_dynamic_routing) :
             app_(vsomeip::runtime::get()->create_application()),
             is_registered_(false),
             use_tcp_(_use_tcp),
             cycle_(_cycle),
+            size_(_size),
+			payload_data_(nullptr),
             use_dynamic_routing_(_use_dynamic_routing),			
             blocked_(false),
             running_(true),
@@ -60,6 +55,10 @@ public:
             std::cerr << "Couldn't initialize application" << std::endl;
             return false;
         }
+
+		payload_data_ = new uint8_t[size_];
+		for (uint8_t i = 0 ; i < size_; ++i)
+			payload_data_[i] = (uint8_t)(i%10);
 		configuration_ = app_->get_configuration();
 		std::cout << "Got configuration "<<std::endl;
 		for (auto i : configuration_->get_local_services()) {
@@ -80,7 +79,7 @@ public:
 			{
 				std::lock_guard<std::mutex> its_lock(payload_mutex_);
 				payload_ = vsomeip::runtime::get()->create_payload();
-				payload_->set_data(payload_data, sizeof(payload_data));
+				payload_->set_data(payload_data_, sizeof(payload_data_));
 			}
 			auto service = configuration_->find_service(i.first, i.second);
 			service_map.insert(std::make_pair(i, service));
@@ -145,6 +144,7 @@ public:
         offer_thread_.join();
         notify_thread_.join();
         app_->stop();
+		delete payload_data_;
     }
 #endif
 
@@ -236,13 +236,9 @@ public:
     }
 
     void notify() {
-		
         std::shared_ptr<vsomeip::message> its_message
             = vsomeip::runtime::get()->create_request(use_tcp_);
-//		vsomeip::byte_t payload_data[10];
-		uint32_t its_size = 1;
-//		for (uint32_t i = 0; i < 10; ++i)
-//			payload_data[i] = static_cast<uint8_t>(i+1);
+		static uint32_t count = 0;
 		std::unique_lock<std::mutex> its_lock(notify_mutex_);
 		while (!is_offered_ && running_)
 			notify_condition_.wait(its_lock);
@@ -256,41 +252,26 @@ public:
 				uint16_t event_ = SAMPLE_EVENT_ID;
 				auto service_ = service_map.at(i.first);
 				
-				if (service_)
+				if (service_) // otherwise throw?
 				{
 					for (auto j : service_->eventgroups_)
 					{
-//						if (!j.first)
-//							continue;
 						for (auto k : j.second->events_)
 						{
 							event_ = k->id_ ;
-/* 							if (k->update_cycle_.count()) */
-/* 							{ */
-/* //								app_->get_routing_manager()->find_event(i.first.first, i.first.second, event_)->set_payload(payload_, its_size); */
-/* 								app_->notify(i.first.first, i.first.second, event_, payload_); */
-/* 								continue; */
-/* 							} */
-							{
-								
-								if (its_size > sizeof(payload_data))
-								{
-									its_size = 3;
-								}
-								
+							*(uint32_t*)payload_data_ =  count++;
+							{								
 								{
 									std::lock_guard<std::mutex> its_lock(payload_mutex_);
-									payload_->set_data(payload_data, its_size);
-//									payload_->set_data((const uint8_t*)&event_, 2);
+									payload_->set_data(payload_data_, size_);
 									/* std::cout << "Setting event "<<std::hex << */
 									/* 	i.first.first<<":"<< i.first.second<<":"<< */
 									/* 	event_ << */
 									/* 	"(Length=" << std::dec << its_size << ")." << std::endl; */
-									VSOMEIP_DEBUG << "Notify by app cycle " << std::hex << event_;
+									VSOMEIP_DEBUG << "Notify by app cycle # " << std::hex << count << " : " << event_ ;
 									/* std::cout << "Notify by app cycle " << std::hex << event_ << std::endl; */
 									app_->notify(i.first.first, i.first.second, event_, payload_);
 								}
-								its_size++;
 							}
 						}
 					}
@@ -306,6 +287,9 @@ private:
     bool is_registered_;
     bool use_tcp_;
     uint32_t cycle_;
+    uint32_t size_;
+	uint8_t *payload_data_;
+
     bool use_dynamic_routing_;
 
     std::mutex mutex_;
@@ -320,7 +304,6 @@ private:
     std::mutex payload_mutex_;
     std::shared_ptr<vsomeip::payload> payload_;
 
-	//serviceinfo service_info;  
 	std::map<std::pair<vsomeip_v3::service_t, vsomeip_v3::instance_t>, std::shared_ptr<vsomeip_v3::cfg::service>> service_map;
     // blocked_ / is_offered_ must be initialized before starting the threads!
     std::thread offer_thread_;
@@ -340,10 +323,12 @@ int main(int argc, char **argv) {
     bool use_dynamic_routing(false);
     bool use_tcp = false;
     uint32_t cycle = 1000; // default 1s
-
+	uint32_t size = 10; // bytes
+	
     std::string tcp_enable("--tcp");
     std::string udp_enable("--udp");
     std::string cycle_arg("--cycle");
+    std::string size_arg("--size");
     std::string dynamic_routing_enable("--dynamic-routing");
 
     for (int i = 1; i < argc; i++) {
@@ -366,12 +351,20 @@ int main(int argc, char **argv) {
             std::stringstream converter;
             converter << argv[i];
             converter >> cycle;
+			std::cout << "Will cycle for "<<cycle<< "for events update" << std::endl;
+
+        }
+        else if (size_arg == argv[i] && i + 1 < argc) {
+            i++;
+            std::stringstream converter;
+            converter << argv[i];
+            converter >> size;
         }
 		else
 			std::cerr << "Unknown arg ignored! " << argv[i] << std::endl;
     }
 
-    service_sample its_sample(use_tcp, cycle, use_dynamic_routing);
+    service_sample its_sample(use_tcp, cycle, size, use_dynamic_routing);
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     its_sample_ptr = &its_sample;
     signal(SIGINT, handle_signal);
