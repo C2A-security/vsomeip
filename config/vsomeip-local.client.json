@@ -1,10 +1,11 @@
 {
-    "unicast" : "10.42.0.1",
+	"network" : "vsomeip1",
+    "unicast" : "127.0.0.2",
     "logging" :
     { 
         "level" : "debug",
-        "console" : "true",
-        "file" : { "enable" : "true", "path" : "/tmp/vsomeip.log" },
+        "console" : "false",
+        "file" : { "enable" : "true", "path" : "/tmp/vsomeip-client.log" },
         "dlt" : "false"
     },
     "applications" : 
@@ -37,7 +38,7 @@
                     "update-cycle" : 2000
                 },
                 {
-                    "event" : "0x8779",
+                    "event" : "0x0778",
                     "is_field" : "true",
                     "update-cycle" : 0
                 },
@@ -64,7 +65,6 @@
             ]
         }
     ],
-    "routing" : "client-sample",
     "service-discovery" :
     {
         "enable" : "true",

@@ -93,6 +93,7 @@ bool utility::is_routing_manager(const std::shared_ptr<configuration> &_config) 
     }
 #endif
     std::string its_lockfile(its_base_path + ".lck");
+	VSOMEIP_DEBUG << "Lockfile to use: " << its_lockfile;
     int its_lock_ctrl(-1);
 
     struct flock its_lock_data = { F_WRLCK, SEEK_SET, 0, 0, 0 };

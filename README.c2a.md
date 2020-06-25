@@ -26,3 +26,11 @@ make clean all
 - export LD_LIBRARY_PATH=<path to local above>/lib
 
 - env VSOMEIP_APPLICATION_NAME=<app name> VSOMEIP_CONFIGURATION=<path to vsomeip-local.json>
+
+
+-- Quick notes on setting up two client to use 'capturable' sockets (not "native" sockets) when run on the same host.
+1) create a dummy interface, define 127.0.0.2/8 for it
+2) [maybe unnecessary, check]  define 127.0.0.1/8 forcibly for your native lo
+3) add your multicast routes to both
+4) use separate config .jsons for vsomeip apps. the the "routing" section can be removed, or set for each app to itself.
+5) add "network" param on top level, with distinct names, like "network":"0" and "network":"1" in the two .jsons

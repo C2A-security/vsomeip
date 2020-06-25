@@ -1,10 +1,11 @@
 {
+	"network" : "vsomeip0",
     "unicast" : "127.0.0.1",
     "logging" :
     { 
-        "level" : "info",
+        "level" : "debug",
         "console" : "false",
-        "file" : { "enable" : "false", "path" : "/tmp/vsomeip-service.log" },
+        "file" : { "enable" : "true", "path" : "/tmp/vsomeip-service.log" },
         "dlt" : "false"
     },
     "applications" : 
@@ -18,7 +19,6 @@
             "id" : "0x1344"
         }
     ],
-	"routing" : "service-sample",
     "services" :
     [
         {
@@ -38,9 +38,9 @@
                     "update-cycle" : 2000
                 },
                 {
-                    "event" : "0x8779",
+                    "event" : "0x0778",
                     "is_field" : "true",
-                    "update-cycle" : 0
+                    "update-cycle" : 0 
                 },
                 {
                     "event" : "0x0779",
