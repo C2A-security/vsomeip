@@ -1,11 +1,11 @@
 {
-	"network" : "vsomeip0",
-    "unicast" : "127.0.0.1",
+	"network" : "vsomeip1",
+    "unicast" : "127.0.0.2",
     "logging" :
     { 
         "level" : "debug",
-        "console" : "false",
-        "file" : { "enable" : "true", "path" : "/tmp/vsomeip-service.log" },
+        "console" : "true",
+        "file" : { "enable" : "true", "path" : "/tmp/vsomeip-client.log" },
         "dlt" : "false"
     },
     "applications" : 
@@ -24,12 +24,8 @@
         {
             "service" : "0x1234",
             "instance" : "0x5678",
-            "unreliable" : "30509",
-            "multicast" : 
-            { 
-                "address" : "224.225.226.233", 
-                "port" : "32344"
-            },
+            "reliable" : { "port" : "30509", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
             "events" : 
             [
                 {
@@ -38,9 +34,9 @@
                     "update-cycle" : 2000
                 },
                 {
-                    "event" : "0x0778",
+                    "event" : "0x778",
                     "is_field" : "true",
-                    "update-cycle" : 0 
+                    "update-cycle" : 0
                 },
                 {
                     "event" : "0x0779",

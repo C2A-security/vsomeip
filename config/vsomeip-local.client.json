@@ -44,7 +44,7 @@
                 },
                 {
                     "event" : "0x0779",
-                    "is_field" : "true"
+                    "is_field" : "false"
                 }
             ],
             "eventgroups" :
