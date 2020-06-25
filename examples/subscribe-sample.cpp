@@ -14,12 +14,12 @@
 
 #include <vsomeip/vsomeip.hpp>
 #include <vsomeip/enumeration_types.hpp>
-#ifdef VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS
-#include "implementation/configuration/include/configuration_impl.hpp"
-#else
+//#ifdef VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS
+//#include "implementation/configuration/include/configuration_impl.hpp"
+//#else
 #include "configuration/include/configuration.hpp"
 #include "configuration/include/configuration_plugin.hpp"
-#endif // VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS
+//#endif // VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS
 
 #include <configuration/include/service.hpp>
 #include <configuration/include/eventgroup.hpp>
