@@ -184,13 +184,13 @@ public:
         std::shared_ptr<vsomeip::payload> its_payload =
                 _response->get_payload();
         its_message << "(" << std::dec << its_payload->get_length() << ") ";
-        for (uint32_t i = 0; i < its_payload->get_length(); ++i)
+        for (uint32_t i = 0; i < its_payload->get_length()%10; ++i)
             its_message << std::hex << std::setw(2) << std::setfill('0')
                 << (int) its_payload->get_data()[i] << " ";
         VSOMEIP_DEBUG << its_message.str();
 
         if (do_methods_ && _response->get_client() == 0) {
-            if ((its_payload->get_length() % do_methods_) == 0) {
+            if (((*(uint32_t*) its_payload->get_data()) % do_methods_) == 0) {
                 std::shared_ptr<vsomeip::message> its_get
                     = vsomeip::runtime::get()->create_request();
                 its_get->set_service(SAMPLE_SERVICE_ID);
@@ -201,7 +201,7 @@ public:
                 app_->send(its_get);
             }
 
-            if ((its_payload->get_length() % (do_methods_+1)) == 0) {
+			if (((*(uint32_t*) its_payload->get_data()) % (do_methods_+1)) == 0) {
                 std::shared_ptr<vsomeip::message> its_set
                     = vsomeip::runtime::get()->create_request();
                 its_set->set_service(SAMPLE_SERVICE_ID);
@@ -256,7 +256,7 @@ int main(int argc, char **argv) {
         }
 		else if (methods_once_in == argv[i]) {
 			std::stringstream converter;
-			converter << argv[i];
+			converter << argv[++i];
 			converter >> do_methods;
 		}
 		else
