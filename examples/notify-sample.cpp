@@ -149,18 +149,24 @@ public:
 #endif
 
     void offer() {
-        std::lock_guard<std::mutex> its_lock(notify_mutex_);
+		VSOMEIP_INFO << "Time to start offer";
+		std::lock_guard<std::mutex> its_lock(notify_mutex_);
 		for (auto i : service_map)
+		{
 			app_->offer_service(i.first.first, i.first.second);
+		}
         is_offered_ = true;
         notify_condition_.notify_one();
     }
 
     void stop_offer() {
-        std::lock_guard<std::mutex> its_lock(notify_mutex_);
-		for (auto i : service_map)		
+		VSOMEIP_INFO << "Time to stop offer";
+		is_offered_ = false;
+		std::lock_guard<std::mutex> its_lock(notify_mutex_);
+		for (auto i : service_map)
+		{
 			app_->stop_offer_service(i.first.first, i.first.second);
-        is_offered_ = false;
+		}
     }
 
     void on_state(vsomeip::state_type_e _state) {
@@ -228,7 +234,7 @@ public:
                 else
                     stop_offer();
 
-                for (int i = 0; i < 10 && running_; i++)
+                for (int i = 0; i < ((is_offer)?cycle_/100:1) && running_; i++)
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                 is_offer = !is_offer;
             }
@@ -239,45 +245,58 @@ public:
         std::shared_ptr<vsomeip::message> its_message
             = vsomeip::runtime::get()->create_request(use_tcp_);
 		static uint32_t count = 0;
-		std::unique_lock<std::mutex> its_lock(notify_mutex_);
-		while (!is_offered_ && running_)
-			notify_condition_.wait(its_lock);
-		while (is_offered_ && running_)
+		while (running_)
 		{
-			for (auto i : service_map)
-			{			
-				its_message->set_service(i.first.first);
-				its_message->set_instance(i.first.second);
-				its_message->set_method(SAMPLE_GET_METHOD_ID); // or SET ??
-				uint16_t event_ = SAMPLE_EVENT_ID;
-				auto service_ = service_map.at(i.first);
+			std::unique_lock<std::mutex> its_lock(notify_mutex_);
+			while (!is_offered_ && running_)
+				notify_condition_.wait(its_lock);
+			while (is_offered_ && running_)
+			{
+				for (auto i : service_map)
+				{			
+					if (!is_offered_)
+						break;
+					its_message->set_service(i.first.first);
+					its_message->set_instance(i.first.second);
+					its_message->set_method(SAMPLE_GET_METHOD_ID); // or SET ??
+					uint16_t event_ = SAMPLE_EVENT_ID;
+					auto service_ = service_map.at(i.first);
+					if (!is_offered_)
+						break;
 				
-				if (service_) // otherwise throw?
-				{
-					for (auto j : service_->eventgroups_)
+					if (service_) // otherwise throw?
 					{
-						for (auto k : j.second->events_)
+						for (auto j : service_->eventgroups_)
 						{
-							event_ = k->id_ ;
-							*(uint32_t*)payload_data_ =  count++;
-							{								
-								{
-									std::lock_guard<std::mutex> its_lock(payload_mutex_);
-									payload_->set_data(payload_data_, size_);
-									/* std::cout << "Setting event "<<std::hex << */
-									/* 	i.first.first<<":"<< i.first.second<<":"<< */
-									/* 	event_ << */
-									/* 	"(Length=" << std::dec << its_size << ")." << std::endl; */
-									VSOMEIP_DEBUG << "Notify by app cycle # " << std::hex << count << " : " << event_ ;
-									/* std::cout << "Notify by app cycle " << std::hex << event_ << std::endl; */
-									app_->notify(i.first.first, i.first.second, event_, payload_);
+							if (!is_offered_)
+								break;
+							for (auto k : j.second->events_)
+							{
+								if (!is_offered_)
+									break;
+								event_ = k->id_ ;
+								*(uint32_t*)payload_data_ =  count++;
+								{								
+									{
+										std::lock_guard<std::mutex> its_lock(payload_mutex_);
+										payload_->set_data(payload_data_, size_);
+										/* std::cout << "Setting event "<<std::hex << */
+										/* 	i.first.first<<":"<< i.first.second<<":"<< */
+										/* 	event_ << */
+										/* 	"(Length=" << std::dec << its_size << ")." << std::endl; */
+										VSOMEIP_DEBUG << "Notify by app cycle # " << std::hex << count << " : " << event_ ;
+										/* std::cout << "Notify by app cycle " << std::hex << event_ << std::endl; */
+										app_->notify(i.first.first, i.first.second, event_, payload_);
+									}
 								}
 							}
 						}
 					}
 				}
+				if (!is_offered_)
+					break;
+				std::this_thread::sleep_for(std::chrono::milliseconds(cycle_));
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(cycle_));
 		}
     }
 
@@ -335,24 +354,20 @@ int main(int argc, char **argv) {
         if (tcp_enable == argv[i]) {
             use_tcp = true;
 			std::cout << "Will use tcp for requests" << std::endl;
-            break;
         }
         else if (udp_enable == argv[i]) {
             use_tcp = false;
-            break;
         }
         else if (dynamic_routing_enable == argv[i]) {
             use_dynamic_routing = true;
 			std::cout << "Will use dynamic routing (un/re-offering service[s])" << std::endl;
         }
-
         else if (cycle_arg == argv[i] && i + 1 < argc) {
             i++;
             std::stringstream converter;
             converter << argv[i];
             converter >> cycle;
 			std::cout << "Will cycle for "<<cycle<< "for events update" << std::endl;
-
         }
         else if (size_arg == argv[i] && i + 1 < argc) {
             i++;

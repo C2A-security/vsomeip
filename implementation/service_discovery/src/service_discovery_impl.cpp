@@ -3659,6 +3659,20 @@ reliability_type_e service_discovery_impl::get_eventgroup_reliability(
         service_t _service, instance_t _instance, eventgroup_t _eventgroup,
         const std::shared_ptr<subscription>& _subscription) {
     reliability_type_e its_reliability = reliability_type_e::RT_UNKNOWN;
+	// ilya put the fallback here once more
+	switch (get_remote_offer_type(_service, _instance)) {
+	case remote_offer_type_e::RELIABLE:
+		its_reliability = reliability_type_e::RT_RELIABLE;
+		break;
+	case remote_offer_type_e::UNRELIABLE:
+		its_reliability = reliability_type_e::RT_UNRELIABLE;
+		break;
+	case remote_offer_type_e::RELIABLE_UNRELIABLE:
+		its_reliability = reliability_type_e::RT_BOTH;
+		break;
+	default:
+		;
+	}
     auto its_info = _subscription->get_eventgroupinfo().lock();
     if (its_info) {
         its_reliability = its_info->get_reliability();

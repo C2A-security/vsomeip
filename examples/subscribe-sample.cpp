@@ -14,6 +14,7 @@
 
 #include <vsomeip/vsomeip.hpp>
 #include <vsomeip/enumeration_types.hpp>
+//#include <vsomeip/primitive_types.hpp>
 //#ifdef VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS
 //#include "implementation/configuration/include/configuration_impl.hpp"
 //#else
@@ -34,28 +35,12 @@ public:
 				_use_tcp), do_methods_(_do_methods) {
     }
 
-	void subscribe(bool first_time)
+	void subscribe_one(vsomeip::service_t service, vsomeip::instance_t instance)
 		{
-//			static bool first_time = true;
-			
-			for (auto i : service_map) {
-				VSOMEIP_INFO << "Registering message handler for instance "<<std::hex <<i.first.second;
-				if (first_time)
-				app_->register_message_handler(
-					vsomeip::ANY_SERVICE, //i.first,
-					i.first.second, 
-					vsomeip::ANY_METHOD, //SAMPLE_GET_METHOD_ID,
-					std::bind(&client_sample::on_message, this,
-							  std::placeholders::_1));
-				if (first_time)
-					app_->register_availability_handler(i.first.first, i.first.second,
-														std::bind(&client_sample::on_availability,
-																  this,
-																  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-
-				auto service = i.second;
-			
-				for (auto j : service->eventgroups_)
+			auto i = service_map.find(std::make_pair(service, instance));
+			if (i!=service_map.end())
+			{
+				for (auto j : i->second->eventgroups_)
 				{
 					std::set<vsomeip::eventgroup_t> its_groups;
 					its_groups.insert(j.first);
@@ -67,31 +52,62 @@ public:
 						/* 	k->id_<<":"<<std::endl; */
 
 						app_->request_event(
-							i.first.first,
-							i.first.second, 
+							service, instance,
 							k->id_,
 							its_groups,
 							(k->is_field_) ?
 							vsomeip_v3::event_type_e::ET_FIELD : vsomeip_v3::event_type_e::ET_EVENT);
 					}
-					app_->subscribe(i.first.first, i.first.second, j.first);
+					app_->subscribe(service, instance, j.first);
 				}
+			}
+		}
+	
+	void subscribe(bool first_time)
+		{
+//			static bool first_time = true;
+			
+			for (auto i : service_map) {
+				if (first_time)
+				{
+					VSOMEIP_INFO << "Registering message handler for instance "<<std::hex <<i.first.second;
+
+				app_->register_message_handler(
+					vsomeip::ANY_SERVICE, //i.first,
+					i.first.second, 
+					vsomeip::ANY_METHOD, //SAMPLE_GET_METHOD_ID,
+					std::bind(&client_sample::on_message, this,
+							  std::placeholders::_1));
+				}
+				if (first_time)
+					app_->register_availability_handler(i.first.first, i.first.second,
+														std::bind(&client_sample::on_availability,
+																  this,
+																  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
+				subscribe_one(i.first.first, i.first.second);
 			}
 			first_time = false;
 		}
-	void unsubscribe()
+	void unsubscribe_one(vsomeip::service_t service, vsomeip::instance_t instance)
 		{
-			
+			auto i = service_map.find(std::make_pair(service, instance));
+			if (i!=service_map.end())
+			{
+				for (auto j : i->second->events_)
+				{
+					app_->release_event(service, instance, j.first);
+				}
+				for (auto j : i->second->eventgroups_)
+				{
+					app_->unsubscribe(service, instance, j.first);
+				}
+			}
+		}
+	void unsubscribe()
+		{			
 			for (auto i : service_map) {
-				auto service = i.second;
-				for (auto j : service->events_)
-				{
-					app_->release_event(i.first.first, i.first.second, j.first);
-				}
-				for (auto j : service->eventgroups_)
-				{
-					app_->unsubscribe(i.first.first, i.first.second, j.first);
-				}
+				unsubscribe_one(i.first.first, i.first.second);
 			}
 		}
     bool init() {
@@ -160,10 +176,10 @@ public:
 					  << "] is "
 					  << (_is_available ? "available." : "NOT available.")
 					  << std::endl;
-			if (_is_available && !last_a)
-				subscribe(false);
-			else if (last_a)
-				unsubscribe();
+			if (_is_available)
+				subscribe_one(_service, _instance);
+			else 
+				unsubscribe_one(_service, _instance);
 			last_a = _is_available;
 		}
 

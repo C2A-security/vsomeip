@@ -1,0 +1,1882 @@
+{
+	"network" : "vsomeip1",
+    "unicast" : "127.0.0.2",
+    "logging" :
+    { 
+        "level" : "debug",
+        "console" : "true",
+        "file" : { "enable" : "true", "path" : "/tmp/vsomeip-client.log" },
+        "dlt" : "false"
+    },
+    "applications" : 
+    [
+        {    
+            "name" : "client-sample",
+            "id" : "0x1344",
+			"max_dispatchers" : 100,
+			"max_dispatch_time" : 500,
+			"threads" : 4
+        }
+    ],
+    "services" :
+    [
+        {
+            "service" : "0x1234",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30509", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true",
+                    "update-cycle" : 2000
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },
+		{
+            "service" : "0x1235",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30510", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },
+		{
+            "service" : "0x1236",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30511", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1237",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30512", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1238",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30513", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1239",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30514", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x123a",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30515", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x123b",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30516", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x123c",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30517", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x123d",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30518", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x123e",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30519", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x123f",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30520", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1240",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30521", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1241",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30522", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1242",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30523", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1243",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30524", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1244",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30525", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1245",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30526", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1246",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30527", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1247",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30528", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1248",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30529", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1249",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30530", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x124a",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30531", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x124b",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30532", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x124c",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30533", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x124d",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30534", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x124e",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30535", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x124f",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30536", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1250",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30537", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1251",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30538", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1252",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30539", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1253",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30540", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1254",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30541", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1255",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30542", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1256",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30543", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1257",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30544", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1258",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30545", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1259",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30546", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x125a",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30547", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x125b",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30548", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x125c",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30549", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x125d",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30550", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x125e",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30551", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x125f",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30552", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1260",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30553", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1261",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30554", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1262",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30555", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1263",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30556", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1264",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30557", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1265",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30558", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1266",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30559", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1267",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30560", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1268",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30561", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1269",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30562", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x126a",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30563", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x126b",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30564", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x126c",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30565", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x126d",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30566", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x126e",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30567", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x126f",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30568", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1270",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30569", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1271",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30570", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1272",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30571", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1273",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30572", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1274",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30573", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1275",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30574", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1276",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30575", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1277",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30576", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1278",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30577", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1279",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30578", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x127a",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30579", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x127b",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30580", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x127c",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30581", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x127d",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30582", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x127e",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30583", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x127f",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30584", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1280",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30585", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1281",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30586", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1282",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30587", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1283",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30588", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1284",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30589", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1285",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30590", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1286",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30591", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1287",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30592", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1288",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30593", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x1289",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30594", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x128a",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30595", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x128b",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30596", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x128c",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30597", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x128d",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30598", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x128e",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30599", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        },{
+            "service" : "0x128f",
+            "instance" : "0x5678",
+            "reliable" : { "port" : "30600", "magic-cookies" : false },
+            "unicast" : "127.0.0.1",
+            "events" : 
+            [
+                {
+                    "event" : "0x0777",
+					"is_reliable" : "true",
+                    "is_field" : "true"
+                }
+            ],
+            "eventgroups" :
+            [
+                {
+                    "eventgroup" : "0x4455",
+                    "events" : [ "0x777" ]
+                }
+            ]
+        }
+    ],
+    "service-discovery" :
+    {
+        "enable" : "true",
+        "multicast" : "224.244.224.245",
+        "port" : "30490",
+        "protocol" : "udp",
+        "initial_delay_min" : "10",
+        "initial_delay_max" : "100",
+        "repetitions_base_delay" : "200",
+        "repetitions_max" : "3",
+        "ttl" : "3",
+        "cyclic_offer_delay" : "2000",
+        "request_response_delay" : "1500"
+    }
+}
