@@ -3,7 +3,7 @@
     "unicast" : "127.0.0.2",
     "logging" :
     { 
-        "level" : "debug",
+        "level" : "info",
         "console" : "true",
         "file" : { "enable" : "true", "path" : "/tmp/vsomeip-client.log" },
         "dlt" : "false"

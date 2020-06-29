@@ -5,23 +5,26 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 ##### Build Instructions for Linux
-- See th README.md for dependencies
+- See the README.md for dependencies
 
 - Compiling has to be done like this now (from vsomeip_c2a directory):
-mkdir local # if you don't intend to install vsomeip libs system-wise
-mkdir build
-cd build
-rm CMakeCache.txt CMakeFiles -rf && cmake -DCMAKE_INSTALL_PREFIX:PATH=../local -DENABLE_SIGNAL_HANDLING=1 -DCMAKE_BUILD_TYPE=Debug ..
-make -j4
+
+mkdir build -p && cd build && rm CMakeCache.txt CMakeFiles -rf && cmake -DCMAKE_INSTALL_PREFIX:PATH="${PWD}" -DENABLE_SIGNAL_HANDLING=1 -DCMAKE_BUILD_TYPE=Debug .. && make -j4
+
 cd examples
-make clean all
 
+make clean all && cd -
 
-***NOTE THIS HAS BEEN MADE A SUBMODULE of modular_network_simulator***
+- now you have examples in bin/ and libs in lib/ of your build/ directory. 
+- note that the ../config dir will be copied over in setup.sh scripts 
 
-- Change the unicast at the top and 'routing' of vsomeip-local.json to your device's IP and the application name you're running on it.
+***NOTE:* This is mainly used as submodule of modular_network_simulator.**
 
-- Add the muticast routes from this config with 'sudo route add -nv XXX.XXX.XXX.XXX <nic>'
+**So setup/build scripts and module .json would now take care of the below**
+
+- Change the unicast at the top and 'routing' of vsomeip-local.<your test>.json to your device's IP and the application name you're running on it.
+
+- Add the multicast routes from this config with 'sudo route add -nv XXX.XXX.XXX.XXX <nic>'
 
 - export LD_LIBRARY_PATH=<path to local above>/lib
 
