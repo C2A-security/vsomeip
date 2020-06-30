@@ -13,14 +13,17 @@
 #include <thread>
 
 #include <vsomeip/vsomeip.hpp>
-
+/* #include <vsomeip/primitive_types.hpp> */
+/* #include <vsomeip/enumeration_types.hpp> */
 #include "sample-ids.hpp"
 
 class client_sample {
 public:
-    client_sample(bool _use_tcp) :
-            app_(vsomeip::runtime::get()->create_application()), use_tcp_(
-                    _use_tcp) {
+    client_sample(vsomeip::service_t _service, vsomeip::instance_t _instance, bool _use_tcp) :
+            app_(vsomeip::runtime::get()->create_application("subscribe-sample-plain")),
+            service_(_service),
+            instance_(_instance),
+			use_tcp_(_use_tcp) {
     }
 
     bool init() {
@@ -38,23 +41,25 @@ public:
                         std::placeholders::_1));
 
         app_->register_message_handler(
-                vsomeip::ANY_SERVICE, SAMPLE_INSTANCE_ID, vsomeip::ANY_METHOD,
+                vsomeip::ANY_SERVICE, instance_, vsomeip::ANY_METHOD,
                 std::bind(&client_sample::on_message, this,
                         std::placeholders::_1));
 
-        app_->register_availability_handler(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID,
-                std::bind(&client_sample::on_availability,
-                          this,
-                          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        app_->register_availability_handler(
+			service_,
+			instance_,
+			std::bind(&client_sample::on_availability,
+					  this,
+					  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
         std::set<vsomeip::eventgroup_t> its_groups;
         its_groups.insert(SAMPLE_EVENTGROUP_ID);
         app_->request_event(
-                SAMPLE_SERVICE_ID,
-                SAMPLE_INSTANCE_ID,
-                SAMPLE_EVENT_ID,
-                its_groups,
-                vsomeip::event_type_e::ET_FIELD);
+			service_,
+			instance_,
+			SAMPLE_EVENT_ID,
+			its_groups,
+			vsomeip::event_type_e::ET_FIELD);
         app_->subscribe(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_EVENTGROUP_ID);
 
         return true;
@@ -70,16 +75,26 @@ public:
      */
     void stop() {
         app_->clear_all_handler();
-        app_->unsubscribe(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_EVENTGROUP_ID);
-        app_->release_event(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_EVENT_ID);
-        app_->release_service(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID);
+        app_->unsubscribe(
+			service_,
+			instance_,
+			SAMPLE_EVENTGROUP_ID);
+        app_->release_event(
+			service_,
+			instance_,
+			SAMPLE_EVENT_ID);
+        app_->release_service(
+			service_,
+			instance_);
         app_->stop();
     }
 #endif
 
     void on_state(vsomeip::state_type_e _state) {
         if (_state == vsomeip::state_type_e::ST_REGISTERED) {
-            app_->request_service(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID);
+            app_->request_service(
+				service_,
+				instance_);
         }
     }
 
@@ -117,8 +132,8 @@ public:
             if ((its_payload->get_length() % 5) == 0) {
                 std::shared_ptr<vsomeip::message> its_get
                     = vsomeip::runtime::get()->create_request();
-                its_get->set_service(SAMPLE_SERVICE_ID);
-                its_get->set_instance(SAMPLE_INSTANCE_ID);
+                its_get->set_service(service_);
+                its_get->set_instance(instance_);
                 its_get->set_method(SAMPLE_GET_METHOD_ID);
                 its_get->set_reliable(use_tcp_);
                 app_->send(its_get);
@@ -127,8 +142,8 @@ public:
             if ((its_payload->get_length() % 8) == 0) {
                 std::shared_ptr<vsomeip::message> its_set
                     = vsomeip::runtime::get()->create_request();
-                its_set->set_service(SAMPLE_SERVICE_ID);
-                its_set->set_instance(SAMPLE_INSTANCE_ID);
+                its_set->set_service(service_);
+                its_set->set_instance(instance_);
                 its_set->set_method(SAMPLE_SET_METHOD_ID);
                 its_set->set_reliable(use_tcp_);
 
@@ -146,7 +161,10 @@ public:
 
 private:
     std::shared_ptr< vsomeip::application > app_;
-    bool use_tcp_;
+	vsomeip::service_t service_;
+	vsomeip::instance_t instance_;
+	bool use_tcp_;
+	
 };
 
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
@@ -159,10 +177,15 @@ private:
 #endif
 
 int main(int argc, char **argv) {
+	vsomeip::service_t service = SAMPLE_SERVICE_ID;
+	vsomeip::instance_t instance = SAMPLE_INSTANCE_ID;
+
     bool use_tcp = false;
 
     std::string tcp_enable("--tcp");
     std::string udp_enable("--udp");
+    std::string service_arg("--service");
+    std::string instance_arg("--instance");
 
     int i = 1;
     while (i < argc) {
@@ -171,10 +194,31 @@ int main(int argc, char **argv) {
         } else if (udp_enable == argv[i]) {
             use_tcp = false;
         }
+        else if (service_arg == argv[i] && i + 1 < argc) {
+            i++;
+            std::stringstream converter;
+            if (argv[i][1] > 1 && argv[i][0] == '0' && argv[i][1] == 'x') 
+                converter << std::hex << argv[i];			
+			else
+                converter << std::hex << argv[i];							
+            converter >> service;
+        }
+        else if (instance_arg == argv[i] && i + 1 < argc) {
+            i++;
+            std::stringstream converter;
+            if (argv[i][1] > 1 && argv[i][0] == '0' && argv[i][1] == 'x') 
+                converter << std::hex << argv[i];			
+			else
+                converter << std::hex << argv[i];							
+            converter >> instance;
+        }
+		else
+			std::cerr << "Unknown arg ignored! " << argv[i] << std::endl;
+
         i++;
     }
 
-    client_sample its_sample(use_tcp);
+    client_sample its_sample(service, instance, use_tcp);
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     its_sample_ptr = &its_sample;
     signal(SIGINT, handle_signal);

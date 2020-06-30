@@ -29,15 +29,15 @@ add_executable(notify-sample notify-sample.cpp ${EXAMPLE_CONFIG_FILES})
 target_link_libraries(notify-sample ${VSOMEIP_NAME} ${Boost_LIBRARIES} ${DL_LIBRARY})
 
 add_executable(subscribe-sample-plain subscribe-sample-plain.cpp)
-target_link_libraries(subscribe-sample ${VSOMEIP_NAME} ${Boost_LIBRARIES} ${DL_LIBRARY})
+target_link_libraries(subscribe-sample-plain ${VSOMEIP_NAME} ${Boost_LIBRARIES} ${DL_LIBRARY})
 
 add_executable(notify-sample-plain notify-sample-plain.cpp)
-target_link_libraries(notify-sample ${VSOMEIP_NAME} ${Boost_LIBRARIES} ${DL_LIBRARY})
+target_link_libraries(notify-sample-plain ${VSOMEIP_NAME} ${Boost_LIBRARIES} ${DL_LIBRARY})
 
-add_dependencies(examples request-sample response-sample subscribe-sample notify-sample)
+add_dependencies(examples request-sample response-sample subscribe-sample notify-sample-plain subscribe-sample notify-sample-plain)
 
 install (
-    TARGETS request-sample response-sample subscribe-sample notify-sample
+    TARGETS request-sample response-sample subscribe-sample notify-sample subscribe-sample-plain notify-sample-plain
     RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin
 )
 

@@ -19,9 +19,11 @@
 
 class service_sample {
 public:
-    service_sample(bool _use_tcp, uint32_t _cycle) :
+    service_sample(vsomeip::service_t _service, vsomeip::instance_t _instance, bool _use_tcp, uint32_t _cycle) :
             app_(vsomeip::runtime::get()->create_application()),
             is_registered_(false),
+            service_(_service),
+            instance_(_instance),
             use_tcp_(_use_tcp),
             cycle_(_cycle),
             blocked_(false),
@@ -43,28 +45,28 @@ public:
                         std::placeholders::_1));
 
         app_->register_message_handler(
-                SAMPLE_SERVICE_ID,
-                SAMPLE_INSTANCE_ID,
-                SAMPLE_GET_METHOD_ID,
-                std::bind(&service_sample::on_get, this,
-                          std::placeholders::_1));
+			service_,
+			instance_,
+			SAMPLE_GET_METHOD_ID,
+			std::bind(&service_sample::on_get, this,
+					  std::placeholders::_1));
 
         app_->register_message_handler(
-                SAMPLE_SERVICE_ID,
-                SAMPLE_INSTANCE_ID,
-                SAMPLE_SET_METHOD_ID,
-                std::bind(&service_sample::on_set, this,
-                          std::placeholders::_1));
-
+			service_,
+			instance_,
+			SAMPLE_SET_METHOD_ID,
+			std::bind(&service_sample::on_set, this,
+					  std::placeholders::_1));
+		
         std::set<vsomeip::eventgroup_t> its_groups;
         its_groups.insert(SAMPLE_EVENTGROUP_ID);
         app_->offer_event(
-                SAMPLE_SERVICE_ID,
-                SAMPLE_INSTANCE_ID,
-                SAMPLE_EVENT_ID,
-                its_groups,
-                vsomeip::event_type_e::ET_FIELD, std::chrono::milliseconds::zero(),
-                false, true, nullptr, vsomeip::reliability_type_e::RT_UNKNOWN);
+			service_,
+			instance_,
+			SAMPLE_EVENT_ID,
+			its_groups,
+			vsomeip::event_type_e::ET_FIELD, std::chrono::milliseconds::zero(),
+			false, true, nullptr, vsomeip::reliability_type_e::RT_UNKNOWN);
         {
             std::lock_guard<std::mutex> its_lock(payload_mutex_);
             payload_ = vsomeip::runtime::get()->create_payload();
@@ -98,13 +100,14 @@ public:
 
     void offer() {
         std::lock_guard<std::mutex> its_lock(notify_mutex_);
-        app_->offer_service(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID);
+        app_->offer_service(service_, instance_);
+
         is_offered_ = true;
         notify_condition_.notify_one();
     }
 
     void stop_offer() {
-        app_->stop_offer_service(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID);
+        app_->stop_offer_service(service_, instance_);
         is_offered_ = false;
     }
 
@@ -142,7 +145,7 @@ public:
         }
 
         app_->send(its_response);
-        app_->notify(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID,
+        app_->notify(service_, instance_,
                      SAMPLE_EVENT_ID, payload_);
     }
 
@@ -169,8 +172,8 @@ public:
         std::shared_ptr<vsomeip::message> its_message
             = vsomeip::runtime::get()->create_request(use_tcp_);
 
-        its_message->set_service(SAMPLE_SERVICE_ID);
-        its_message->set_instance(SAMPLE_INSTANCE_ID);
+        its_message->set_service(service_);
+        its_message->set_instance(instance_);
         its_message->set_method(SAMPLE_SET_METHOD_ID);
 
         vsomeip::byte_t its_data[10];
@@ -192,7 +195,7 @@ public:
                     payload_->set_data(its_data, its_size);
 
                     std::cout << "Setting event (Length=" << std::dec << its_size << ")." << std::endl;
-                    app_->notify(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_EVENT_ID, payload_);
+                    app_->notify(service_, instance_, SAMPLE_EVENT_ID, payload_);
                 }
 
                 its_size++;
@@ -205,6 +208,8 @@ public:
 private:
     std::shared_ptr<vsomeip::application> app_;
     bool is_registered_;
+	vsomeip::service_t service_;
+	vsomeip::instance_t instance_;
     bool use_tcp_;
     uint32_t cycle_;
 
@@ -237,30 +242,52 @@ private:
 int main(int argc, char **argv) {
     bool use_tcp = false;
     uint32_t cycle = 1000; // default 1s
-
+	vsomeip::service_t service = SAMPLE_SERVICE_ID;
+	vsomeip::instance_t instance = SAMPLE_INSTANCE_ID;
+	
     std::string tcp_enable("--tcp");
     std::string udp_enable("--udp");
     std::string cycle_arg("--cycle");
+    std::string service_arg("--service");
+    std::string instance_arg("--instance");
 
     for (int i = 1; i < argc; i++) {
         if (tcp_enable == argv[i]) {
             use_tcp = true;
-            break;
-        }
-        if (udp_enable == argv[i]) {
+          }
+        else if (udp_enable == argv[i]) {
             use_tcp = false;
-            break;
         }
-
-        if (cycle_arg == argv[i] && i + 1 < argc) {
+        else if (cycle_arg == argv[i] && i + 1 < argc) {
             i++;
             std::stringstream converter;
             converter << argv[i];
             converter >> cycle;
         }
+        else if (service_arg == argv[i] && i + 1 < argc) {
+            i++;
+            std::stringstream converter;
+            if (argv[i][1] > 1 && argv[i][0] == '0' && argv[i][1] == 'x') 
+                converter << std::hex << argv[i];			
+			else
+                converter << std::hex << argv[i];							
+            converter >> service;
+        }
+        else if (instance_arg == argv[i] && i + 1 < argc) {
+            i++;
+            std::stringstream converter;
+            if (argv[i][1] > 1 && argv[i][0] == '0' && argv[i][1] == 'x') 
+                converter << std::hex << argv[i];			
+			else
+                converter << std::hex << argv[i];							
+            converter >> instance;
+        }
+		else
+			std::cerr << "Unknown arg ignored! " << argv[i] << std::endl;
+
     }
 
-    service_sample its_sample(use_tcp, cycle);
+    service_sample its_sample(service, instance, use_tcp, cycle);
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     its_sample_ptr = &its_sample;
     signal(SIGINT, handle_signal);
