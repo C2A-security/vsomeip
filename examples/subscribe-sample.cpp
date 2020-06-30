@@ -170,7 +170,7 @@ public:
 
     void on_availability(vsomeip::service_t _service, vsomeip::instance_t _instance, bool _is_available)
 		{
-			static bool last_a = false;
+			//	static bool last_a = false;
 			std::cout << "Service ["
 					  << std::setw(4) << std::setfill('0') << std::hex << _service << "." << _instance
 					  << "] is "
@@ -180,7 +180,7 @@ public:
 				subscribe_one(_service, _instance);
 			else 
 				unsubscribe_one(_service, _instance);
-			last_a = _is_available;
+			//last_a = _is_available;
 		}
 
     void on_message(const std::shared_ptr<vsomeip::message> &_response) {

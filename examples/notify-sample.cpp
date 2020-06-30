@@ -234,7 +234,7 @@ public:
                 else
                     stop_offer();
 
-                for (int i = 0; i < ((is_offer)?cycle_/100:1) && running_; i++)
+                for (unsigned int i = 0; i < ((is_offer)?cycle_/100:1) && running_; i++)
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                 is_offer = !is_offer;
             }

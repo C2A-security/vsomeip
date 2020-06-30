@@ -28,6 +28,12 @@ target_link_libraries(subscribe-sample ${VSOMEIP_NAME} ${Boost_LIBRARIES} ${DL_L
 add_executable(notify-sample notify-sample.cpp ${EXAMPLE_CONFIG_FILES})
 target_link_libraries(notify-sample ${VSOMEIP_NAME} ${Boost_LIBRARIES} ${DL_LIBRARY})
 
+add_executable(subscribe-sample-plain subscribe-sample-plain.cpp)
+target_link_libraries(subscribe-sample ${VSOMEIP_NAME} ${Boost_LIBRARIES} ${DL_LIBRARY})
+
+add_executable(notify-sample-plain notify-sample-plain.cpp)
+target_link_libraries(notify-sample ${VSOMEIP_NAME} ${Boost_LIBRARIES} ${DL_LIBRARY})
+
 add_dependencies(examples request-sample response-sample subscribe-sample notify-sample)
 
 install (
