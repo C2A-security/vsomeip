@@ -74,7 +74,8 @@ configuration_impl::configuration_impl()
       log_version_interval_(10),
       permissions_shm_(VSOMEIP_DEFAULT_SHM_PERMISSION),
       permissions_uds_(VSOMEIP_DEFAULT_UDS_PERMISSIONS),
-      network_("vsomeip"),
+
+      network_(VSOMEIP_NETWORK),
       e2e_enabled_(false),
       log_memory_(false),
       log_memory_interval_(0),
@@ -503,7 +504,12 @@ bool configuration_impl::load_data(const std::vector<configuration_element> &_el
             load_acceptances(e);
         }
     }
-
+	if (_load_optional && _load_mandatory && ! _elements.size()) // ilya last pass w/o config - standalone network
+	{
+		const configuration_element _element;
+		load_network(_element);
+		
+	}
     return is_logging_loaded_ && has_routing && has_applications;
 }
 
@@ -1063,6 +1069,15 @@ void configuration_impl::load_network(const configuration_element &_element) {
         }
     } catch (...) {
         // intentionally left empty
+		const char *its_value = getenv(VSOMEIP_ENV_NETWORK);
+		if (nullptr != its_value)
+		{
+			VSOMEIP_INFO << "Network defined through env VSOMEIP_NETWORK=" << its_value;
+			if (is_configured_[ET_NETWORK])
+				VSOMEIP_DEBUG << "Overwriting previously defined network "<<network_;
+			network_ = its_value;
+			is_configured_[ET_NETWORK] = true;
+		}
     }
 }
 

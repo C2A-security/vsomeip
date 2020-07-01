@@ -20,7 +20,7 @@
 class service_sample {
 public:
     service_sample(vsomeip::service_t _service, vsomeip::instance_t _instance, bool _use_tcp, uint32_t _cycle) :
-            app_(vsomeip::runtime::get()->create_application()),
+            app_(vsomeip::runtime::get()->create_application("notify-sample-plain")),
             is_registered_(false),
             service_(_service),
             instance_(_instance),
@@ -40,6 +40,12 @@ public:
             std::cerr << "Couldn't initialize application" << std::endl;
             return false;
         }
+
+		app_->update_service_configuration(service_, instance_,
+										   30509, //SAMPLE_PORT,
+										   true, //reliable_
+										   false, // magic_cookies_nebled_
+										   true /*offer*/);
         app_->register_state_handler(
                 std::bind(&service_sample::on_state, this,
                         std::placeholders::_1));
@@ -99,9 +105,16 @@ public:
 #endif
 
     void offer() {
+		static bool first_time = true;
         std::lock_guard<std::mutex> its_lock(notify_mutex_);
         app_->offer_service(service_, instance_);
-
+		if (first_time)
+					app_->update_service_configuration(service_, instance_,
+										   30509, //SAMPLE_PORT,
+										   true, //reliable_
+										   false, // magic_cookies_nebled_
+										   true /*offer*/);
+		first_time = false;
         is_offered_ = true;
         notify_condition_.notify_one();
     }
