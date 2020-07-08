@@ -46,8 +46,8 @@ public:
                         std::placeholders::_1));
 
         app_->register_availability_handler(
-			service_,
-			instance_,
+			vsomeip::ANY_SERVICE, //service_,
+			vsomeip::ANY_INSTANCE, //instance_,
 			std::bind(&client_sample::on_availability,
 					  this,
 					  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -60,7 +60,7 @@ public:
 			SAMPLE_EVENT_ID,
 			its_groups,
 			vsomeip::event_type_e::ET_FIELD);
-        app_->subscribe(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_EVENTGROUP_ID);
+        app_->subscribe(service_, instance_, SAMPLE_EVENTGROUP_ID);
 
         return true;
     }
@@ -99,11 +99,45 @@ public:
     }
 
     void on_availability(vsomeip::service_t _service, vsomeip::instance_t _instance, bool _is_available) {
+		static bool last_a_ = false;
         std::cout << "Service ["
                 << std::setw(4) << std::setfill('0') << std::hex << _service << "." << _instance
                 << "] is "
                 << (_is_available ? "available." : "NOT available.")
                 << std::endl;
+		if (_service!=service_ || _instance != instance_)
+		{
+			std::cout << "But we don't care" << std::endl;
+			return;
+		}
+			   
+		if (_is_available && ! last_a_)
+		{
+	        std::set<vsomeip::eventgroup_t> its_groups;
+			its_groups.insert(SAMPLE_EVENTGROUP_ID);
+			app_->request_event(
+				service_,
+				instance_,
+				SAMPLE_EVENT_ID,
+				its_groups,
+				vsomeip::event_type_e::ET_FIELD);
+			app_->subscribe(
+				service_,
+				instance_,
+				SAMPLE_EVENTGROUP_ID);
+		}
+		else if (!_is_available && last_a_)
+		{
+			app_->unsubscribe(
+				service_,
+				instance_,
+				SAMPLE_EVENTGROUP_ID);
+			app_->release_event(
+				service_,
+				instance_,
+				SAMPLE_EVENT_ID);
+		}
+		last_a_ = _is_available;
     }
 
     void on_message(const std::shared_ptr<vsomeip::message> &_response) {
@@ -139,7 +173,7 @@ public:
                 app_->send(its_get);
             }
 
-            if ((its_payload->get_length() % 8) == 0) {
+            else if ((its_payload->get_length() % 8) == 0) {
                 std::shared_ptr<vsomeip::message> its_set
                     = vsomeip::runtime::get()->create_request();
                 its_set->set_service(service_);

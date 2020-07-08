@@ -504,11 +504,13 @@ bool configuration_impl::load_data(const std::vector<configuration_element> &_el
             load_acceptances(e);
         }
     }
-	if (_load_optional && _load_mandatory && ! _elements.size()) // ilya last pass w/o config - standalone network
+	if (_load_optional && ! _elements.size()) // ilya last pass w/o config - standalone network
 	{
-		const configuration_element _element;
-		load_network(_element);
-		
+		const configuration_element _element; // dummy, ugly, todo
+		if (!is_configured_[ET_NETWORK])
+			load_network(_element);
+		if (!is_configured_[ET_UNICAST])
+			load_unicast_address(_element);		
 	}
     return is_logging_loaded_ && has_routing && has_applications;
 }
@@ -1023,7 +1025,16 @@ void configuration_impl::load_unicast_address(const configuration_element &_elem
             is_configured_[ET_UNICAST] = true;
         }
     } catch (...) {
-        // intentionally left empty!
+        // intentionally left empty! then ilya came
+		const char *its_value = getenv(VSOMEIP_ENV_UNICAST);
+		if (nullptr != its_value)
+		{
+			VSOMEIP_INFO << "Unicast defined through env VSOMEIP_UNICAST_ADDRESS=" << its_value;
+			if (is_configured_[ET_UNICAST])
+				VSOMEIP_DEBUG << "Overwriting previously defined unicast "<<unicast_;
+			unicast_ = unicast_.from_string(its_value);
+			is_configured_[ET_UNICAST] = true;
+		}
     }
 }
 

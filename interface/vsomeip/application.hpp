@@ -80,6 +80,13 @@ public:
      */
     virtual client_t get_client() const = 0;
 
+	    /**
+     *
+     * \brief Assigns (new) client identifier to app object
+     *
+     */
+//    virtual void set_client(const client_t &client) = 0;
+
     /**
      * \brief Get the diagnosis address
      *

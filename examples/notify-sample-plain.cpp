@@ -19,13 +19,14 @@
 
 class service_sample {
 public:
-    service_sample(vsomeip::service_t _service, vsomeip::instance_t _instance, bool _use_tcp, uint32_t _cycle) :
+    service_sample(vsomeip::service_t _service, vsomeip::instance_t _instance, bool _use_tcp, uint32_t _cycle, bool _flip_flop) :
             app_(vsomeip::runtime::get()->create_application("notify-sample-plain")),
             is_registered_(false),
             service_(_service),
             instance_(_instance),
             use_tcp_(_use_tcp),
             cycle_(_cycle),
+			flip_flop_(_flip_flop),
             blocked_(false),
             running_(true),
             is_offered_(false),
@@ -40,12 +41,13 @@ public:
             std::cerr << "Couldn't initialize application" << std::endl;
             return false;
         }
-
-		app_->update_service_configuration(service_, instance_,
-										   30509, //SAMPLE_PORT,
-										   true, //reliable_
-										   false, // magic_cookies_nebled_
-										   true /*offer*/);
+//		app_->set_client(SAMPLE_SERVICE_APP_ID);
+		// not yet offered, won't work here :(
+		/* app_->update_service_configuration(service_, instance_, */
+		/* 								   30509, //SAMPLE_PORT, */
+		/* 								   true, //reliable_ */
+		/* 								   false, // magic_cookies_nebled_ */
+		/* 								   true /\*offer*\/); */
         app_->register_state_handler(
                 std::bind(&service_sample::on_state, this,
                         std::placeholders::_1));
@@ -105,16 +107,16 @@ public:
 #endif
 
     void offer() {
-		static bool first_time = true;
+		//static bool first_time = true;
         std::lock_guard<std::mutex> its_lock(notify_mutex_);
         app_->offer_service(service_, instance_);
-		if (first_time)
-					app_->update_service_configuration(service_, instance_,
-										   30509, //SAMPLE_PORT,
-										   true, //reliable_
-										   false, // magic_cookies_nebled_
-										   true /*offer*/);
-		first_time = false;
+		/* if (first_time) */
+		/* 			app_->update_service_configuration(service_, instance_, */
+		/* 								   30509, //SAMPLE_PORT, */
+		/* 								   true, //reliable_ */
+		/* 								   false, // magic_cookies_nebled_ */
+		/* 								   true /\*offer*\/); */
+		//first_time = false;
         is_offered_ = true;
         notify_condition_.notify_one();
     }
@@ -176,8 +178,8 @@ public:
 
             for (int i = 0; i < 10 && running_; i++)
                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-            is_offer = !is_offer;
+			if (flip_flop_)
+				is_offer = !is_offer;
         }
     }
 
@@ -225,7 +227,7 @@ private:
 	vsomeip::instance_t instance_;
     bool use_tcp_;
     uint32_t cycle_;
-
+	bool flip_flop_;
     std::mutex mutex_;
     std::condition_variable condition_;
     bool blocked_;
@@ -254,6 +256,7 @@ private:
 
 int main(int argc, char **argv) {
     bool use_tcp = false;
+	bool flip_flop = false;
     uint32_t cycle = 1000; // default 1s
 	vsomeip::service_t service = SAMPLE_SERVICE_ID;
 	vsomeip::instance_t instance = SAMPLE_INSTANCE_ID;
@@ -261,15 +264,19 @@ int main(int argc, char **argv) {
     std::string tcp_enable("--tcp");
     std::string udp_enable("--udp");
     std::string cycle_arg("--cycle");
+    std::string flip_flop_arg("--flip-flop");
     std::string service_arg("--service");
     std::string instance_arg("--instance");
-
+// todo flip flop
     for (int i = 1; i < argc; i++) {
         if (tcp_enable == argv[i]) {
             use_tcp = true;
           }
         else if (udp_enable == argv[i]) {
             use_tcp = false;
+        }
+        else if (flip_flop_arg == argv[i]) {
+            flip_flop = true;
         }
         else if (cycle_arg == argv[i] && i + 1 < argc) {
             i++;
@@ -300,7 +307,7 @@ int main(int argc, char **argv) {
 
     }
 
-    service_sample its_sample(service, instance, use_tcp, cycle);
+    service_sample its_sample(service, instance, use_tcp, cycle, flip_flop);
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     its_sample_ptr = &its_sample;
     signal(SIGINT, handle_signal);

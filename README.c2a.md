@@ -32,8 +32,19 @@ make clean all && cd -
 
 
 -- Quick notes on setting up two client to use 'capturable' sockets (not "native" sockets) when run on the same host.
-1) create a dummy interface, define 127.0.0.2/8 for it
-2) [maybe unnecessary, check]  define 127.0.0.1/8 forcibly for your native lo
-3) add your multicast routes to both
-4) use separate config .jsons for vsomeip apps. the the "routing" section can be removed, or set for each app to itself.
-5) add "network" param on top level, with distinct names, like "network":"0" and "network":"1" in the two .jsons
+1) add two IP addresses on your loopback interface:
+   sudo ip addr add 127.0.0.2/8 dev lo
+   sudo ip addr add 127.0.0.3/8 dev lo
+2) add your multicast routes to lo:
+   sudo route add 224.244.224.245 lo
+4) you can use reduced config for the client, or same config for both.
+   service has to be defined for the sake of its port -
+   maybe one day I'll overcome this.
+5) you can add "network" param on top level, with distinct names,
+   like "network":"0" and "network":"1"
+   in the two .jsons, and distinct
+   "unicast" : "127.0.0.2" / "unicast" : "127.0.0.2"
+   if you use separate ones.
+6) don't specify network and unicast if you're using the same .json.
+   instead, prepend VSOMEIP_NETWORK=vsomeip0 VSOMEIP_UNICAST_ADDRESS=127.0.0.2 and
+   VSOMEIP_NETWORK=vsomeip1 VSOMEIP_UNICAST_ADDRESS=127.0.0.3 to env for your respective apps
