@@ -107,16 +107,9 @@ public:
 #endif
 
     void offer() {
-		//static bool first_time = true;
+//		static bool first_time = true;
         std::lock_guard<std::mutex> its_lock(notify_mutex_);
         app_->offer_service(service_, instance_);
-		/* if (first_time) */
-		/* 			app_->update_service_configuration(service_, instance_, */
-		/* 								   30509, //SAMPLE_PORT, */
-		/* 								   true, //reliable_ */
-		/* 								   false, // magic_cookies_nebled_ */
-		/* 								   true /\*offer*\/); */
-		//first_time = false;
         is_offered_ = true;
         notify_condition_.notify_one();
     }
@@ -134,6 +127,11 @@ public:
         if (_state == vsomeip::state_type_e::ST_REGISTERED) {
             if (!is_registered_) {
                 is_registered_ = true;
+				app_->update_service_configuration(service_, instance_,
+												   30509, //SAMPLE_PORT,
+												   true, //reliable_
+												   false, // magic_cookies_nebled_
+												   true /*offer*/);				
             }
         } else {
             is_registered_ = false;
