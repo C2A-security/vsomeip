@@ -127,11 +127,11 @@ public:
         if (_state == vsomeip::state_type_e::ST_REGISTERED) {
             if (!is_registered_) {
                 is_registered_ = true;
-				app_->update_service_configuration(service_, instance_,
-												   30509, //SAMPLE_PORT,
-												   true, //reliable_
-												   false, // magic_cookies_nebled_
-												   true /*offer*/);				
+				/* app_->update_service_configuration(service_, instance_, */
+				/* 								   30509, //SAMPLE_PORT, */
+				/* 								   true, //reliable_ */
+				/* 								   false, // magic_cookies_nebled_ */
+				/* 								   true /\*offer*\/);				 */
             }
         } else {
             is_registered_ = false;

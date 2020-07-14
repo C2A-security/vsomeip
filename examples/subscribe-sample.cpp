@@ -61,30 +61,39 @@ public:
 					app_->subscribe(service, instance, j.first);
 				}
 			}
+			else // fallback to samples, just for fun
+			{
+				std::set<vsomeip::eventgroup_t> its_groups;
+				its_groups.insert(SAMPLE_EVENT_ID);
+				app_->request_event(
+					service, instance,
+					SAMPLE_EVENT_ID,
+					its_groups,
+					vsomeip_v3::event_type_e::ET_FIELD);
+				
+				app_->subscribe(service, instance, SAMPLE_EVENTGROUP_ID);				
+			}
 		}
 	
 	void subscribe(bool first_time)
 		{
 //			static bool first_time = true;
-			
+			app_->register_message_handler(
+				vsomeip::ANY_SERVICE, //i.first,
+				vsomeip::ANY_INSTANCE, //i.first.second, 
+				vsomeip::ANY_METHOD, //SAMPLE_GET_METHOD_ID,
+				std::bind(&client_sample::on_message, this,
+						  std::placeholders::_1));
+		
+			app_->register_availability_handler(
+				vsomeip::ANY_SERVICE, //i.first,
+				vsomeip::ANY_INSTANCE, //i.first.second, 
+				std::bind(&client_sample::on_availability,
+						  this,
+						  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+	
+	
 			for (auto i : service_map) {
-				if (first_time)
-				{
-					VSOMEIP_INFO << "Registering message handler for instance "<<std::hex <<i.first.second;
-
-				app_->register_message_handler(
-					vsomeip::ANY_SERVICE, //i.first,
-					i.first.second, 
-					vsomeip::ANY_METHOD, //SAMPLE_GET_METHOD_ID,
-					std::bind(&client_sample::on_message, this,
-							  std::placeholders::_1));
-				}
-				if (first_time)
-					app_->register_availability_handler(i.first.first, i.first.second,
-														std::bind(&client_sample::on_availability,
-																  this,
-																  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-
 				subscribe_one(i.first.first, i.first.second);
 			}
 			first_time = false;
