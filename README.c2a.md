@@ -43,7 +43,7 @@ make clean all && cd -
 5) you can add "network" param on top level, with distinct names,
    like "network":"0" and "network":"1"
    in the two .jsons, and distinct
-   "unicast" : "127.0.0.2" / "unicast" : "127.0.0.2"
+   "unicast" : "127.0.0.2" / "unicast" : "127.0.0.3"
    if you use separate ones.
 6) don't specify network and unicast if you're using the same .json.
    instead, prepend VSOMEIP_NETWORK=vsomeip0 VSOMEIP_UNICAST_ADDRESS=127.0.0.2 and

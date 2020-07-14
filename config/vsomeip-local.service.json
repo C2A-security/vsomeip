@@ -1,10 +1,10 @@
 {
 	"network" : "vsomeip0",
-    "unicast" : "127.0.0.1",
+    "unicast" : "127.0.0.2",
     "logging" :
     { 
         "level" : "debug",
-        "console" : "false",
+        "console" : "true",
         "file" : { "enable" : "true", "path" : "/tmp/vsomeip-service.log" },
         "dlt" : "false"
     },
